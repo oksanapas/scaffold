@@ -1,6 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Scaffold Competence Cards</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
@@ -19,6 +22,10 @@
   --bg:#141a19; --surface:#1d2524; --sunk:#182020; --fg:#e7ecea; --muted:#9aa8a5; --line:#33403e;
   --teal:#3fd0cc; --ring:#e7ecea; --tip:#ff8a7a; color-scheme:dark}
 *{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1400px;margin:0 auto}
@@ -43,7 +50,6 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,5vw,3.2rem)
 .tray .tl{font:800 1rem/1 var(--f-display)}
 .tray .num{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:999px;background:var(--teal);color:#fff;font:800 15px/1 var(--f-display);margin-left:4px}
 .tray .chips{flex:1 1 200px;min-width:0}
-body.nodl .pdfbtn{display:none!important}
 .exhelp{margin:0;color:var(--muted);font-size:13.5px;max-width:75ch}
 .modefoot{margin-top:34px;padding-block:18px;border-top:2px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .goex{position:fixed;z-index:6;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font:800 1rem/1 var(--f-display);background:var(--teal);color:#fff;border:0;border-radius:999px;padding:14px 20px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
@@ -138,7 +144,8 @@ textarea{resize:vertical;min-height:64px}
 footer{color:var(--muted);font-size:12px;padding-block:20px 90px}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card.flash{animation:none;box-shadow:0 0 0 3px var(--teal)}}
 </style>
-
+</head>
+<body>
 <header class="top wrap">
   <h1>Scaffold<br>Competence Cards</h1>
   <p class="lede">All 57 competence cards from the ETF Scaffold toolkit. Tap a code under <b>Good with</b> to jump to that card, or a card's coloured header to see its connections. Use <b>Select for exercise</b> on any cards, then open <b>Exercise</b> to design activities that connect them.</p>
@@ -457,8 +464,6 @@ exView.addEventListener("input",e=>{
 });
 
 /* ---------- PDF export ---------- */
-let dl=null;
-const dlP=Promise.resolve().then(()=>window.claude&&window.claude.use?window.claude.use("downloads"):null).then(d=>{dl=d;if(!d)document.body.classList.add("nodl");return d}).catch(()=>{document.body.classList.add("nodl");return null});
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("load"));document.head.appendChild(s)})}
 async function getPdfMake(){
   if(!(window.pdfMake&&window.pdfMake.createPdf))await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
@@ -511,17 +516,12 @@ async function exportPdf(kind){
   const note=document.getElementById(kind==="ex"?"copyNote":"pdfAllNote");
   note.textContent="Preparing PDF…";
   try{
-    const d=dl||await dlP;
-    if(!d){note.textContent="Downloads aren't available in this view.";return}
     const pm=await getPdfMake();
-    const blob=await new Promise(r=>pm.createPdf(kind==="ex"?exDoc():allDoc()).getBlob(r));
     const name=kind==="ex"?`scaffold-exercise-${picked.map(idOf).join("-")}.pdf`:"scaffold-competence-cards.pdf";
-    await d.save({filename:name,data:blob});
-    note.textContent="PDF saved";
+    pm.createPdf(kind==="ex"?exDoc():allDoc()).download(name);
+    note.textContent="PDF downloaded";
   }catch(e){
-    const c=e&&e.code;
-    note.textContent=c==="declined"?"Download cancelled":c==="rate_limited"?"A download prompt is already open":e&&e.message==="load"?"Couldn't load the PDF tool. Check your connection and try again.":"Couldn't create the PDF. Try again.";
-    if(["unavailable","not_granted","capability_disabled","capability_removed"].includes(c))document.body.classList.add("nodl");
+    note.textContent=e&&e.message==="load"?"Couldn't load the PDF tool. Check your internet connection and try again.":"Couldn't create the PDF. Try again.";
   }
 }
 
@@ -563,4 +563,5 @@ if(h.startsWith("set-")){
 }else if(h){const code=h.replace(/^([a-z])/,"$1.");if(byCode[code])setTimeout(()=>{sel=code;apply();go(code)},50)}
 </script>
 
-</body></html>
+</body>
+</html>
