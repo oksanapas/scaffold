@@ -1,0 +1,605 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Competence Match</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: workshop board — framework A bank | pairing table | framework B bank; stacks on phones with pairs on top */
+:root {
+  --bg: #eef3f6;
+  --surface: #ffffff;
+  --surface-2: #f6f9fb;
+  --ink: #17242e;
+  --ink-soft: #4f6170;
+  --line: #cfdbe3;
+  --accent: #0f6f8f;
+  --accent-ink: #ffffff;
+  --danger: #b4372f;
+  /* framework hues: fill / border / ink */
+  --dig-fill: #fbe1d8; --dig-edge: #d9603b; --dig-ink: #5c1f0c;
+  --grn-fill: #d8ede3; --grn-edge: #3f8f6a; --grn-ink: #12382a;
+  --ent-fill: #f0e0ef; --ent-edge: #6b2d6e; --ent-ink: #3a0f3c;
+  --lif-fill: #eef3d6; --lif-edge: #9db040; --lif-ink: #3a4410;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --shadow: 0 1px 2px rgba(23,36,46,.08), 0 4px 14px rgba(23,36,46,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f171d; --surface: #17222a; --surface-2: #1c2932; --ink: #e6eef3; --ink-soft: #9db0bd; --line: #2d3d48;
+    --accent: #4fb6d6; --accent-ink: #06222c; --danger: #ef7b72;
+    --dig-fill: #4a2116; --dig-edge: #ef7d5a; --dig-ink: #fde3da;
+    --grn-fill: #163a2b; --grn-edge: #5cb88d; --grn-ink: #d6f1e4;
+    --ent-fill: #3a1a3c; --ent-edge: #c07fc3; --ent-ink: #f6e2f6;
+    --lif-fill: #333d12; --lif-edge: #b7cb5c; --lif-ink: #eef5d2;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f171d; --surface: #17222a; --surface-2: #1c2932; --ink: #e6eef3; --ink-soft: #9db0bd; --line: #2d3d48;
+  --accent: #4fb6d6; --accent-ink: #06222c; --danger: #ef7b72;
+  --dig-fill: #4a2116; --dig-edge: #ef7d5a; --dig-ink: #fde3da;
+  --grn-fill: #163a2b; --grn-edge: #5cb88d; --grn-ink: #d6f1e4;
+  --ent-fill: #3a1a3c; --ent-edge: #c07fc3; --ent-ink: #f6e2f6;
+  --lif-fill: #333d12; --lif-edge: #b7cb5c; --lif-ink: #eef5d2;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+.wrap { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 800; letter-spacing: -0.01em; }
+.lede { margin: 0; color: var(--ink-soft); max-width: 62ch; }
+.eyebrow { font-family: var(--f-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-soft); }
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* fw palettes */
+.fw-dig { --fill: var(--dig-fill); --edge: var(--dig-edge); --cink: var(--dig-ink); }
+.fw-grn { --fill: var(--grn-fill); --edge: var(--grn-edge); --cink: var(--grn-ink); }
+.fw-ent { --fill: var(--ent-fill); --edge: var(--ent-edge); --cink: var(--ent-ink); }
+.fw-lif { --fill: var(--lif-fill); --edge: var(--lif-edge); --cink: var(--lif-ink); }
+
+/* ---------- Picker ---------- */
+.picker { display: flex; flex-direction: column; gap: 18px; }
+.fw-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 900px) { .fw-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.fw-tile {
+  position: relative; text-align: left; border: 2px solid var(--line); background: var(--surface);
+  border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; color: var(--ink);
+  transition: border-color .15s, transform .15s, box-shadow .15s; min-width: 0;
+}
+.fw-tile:hover { border-color: var(--edge); }
+.fw-tile[aria-pressed="true"] { border-color: var(--edge); background: var(--fill); color: var(--cink); box-shadow: var(--shadow); }
+.fw-tile .swatch { display: flex; gap: 4px; }
+.fw-tile .swatch i { display: block; height: 8px; flex: 1; border-radius: 2px; background: var(--edge); opacity: .35; }
+.fw-tile .swatch i:nth-child(1) { opacity: 1; } .fw-tile .swatch i:nth-child(2) { opacity: .7; }
+.fw-tile .name { font-family: var(--f-display); font-size: 1.35rem; font-weight: 800; }
+.fw-tile .full { font-size: .9rem; opacity: .85; }
+.fw-tile .meta { font-family: var(--f-mono); font-size: .75rem; opacity: .8; }
+.fw-tile .order {
+  position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--cink); color: var(--fill);
+  font-family: var(--f-mono); font-weight: 500; font-size: .85rem;
+}
+.picker-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.btn {
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 10px; padding: 9px 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn:hover { border-color: var(--ink-soft); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn.danger-armed { border-color: var(--danger); color: var(--danger); }
+.hint { color: var(--ink-soft); font-size: .9rem; }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); border-radius: 999px; padding: 5px 12px; font-size: .85rem; }
+.chip:hover { border-color: var(--ink-soft); }
+
+/* ---------- Board ---------- */
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.toolbar .title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.toolbar h2 { font-size: 1.5rem; font-weight: 800; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; }
+.toolbar h2 .tag { color: var(--ink); }
+.toolbar h2 .x { color: var(--ink-soft); font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.bank { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.bank.drop-hot { outline: 3px dashed var(--edge); outline-offset: -3px; }
+.bank-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; }
+.pair .slot { align-self: stretch; }
+.bank-head h3 { font-size: 1.15rem; color: var(--cink); display: flex; align-items: center; gap: 8px; }
+.bank-head h3::before, .toolbar h2 .tag::before { content: ""; width: .6em; height: .6em; border-radius: 50%; background: var(--edge); flex: none; }
+.toolbar h2 .tag { display: inline-flex; align-items: center; gap: 8px; }
+.bank-head span { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); }
+.area { display: flex; flex-direction: column; gap: 6px; }
+.area-name { font-family: var(--f-mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+.cards { display: flex; flex-direction: column; gap: 6px; }
+
+.card {
+  display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left;
+  background: var(--fill); color: var(--cink); border: 1.5px solid var(--edge);
+  border-radius: 8px; padding: 7px 9px; font-size: .9rem; line-height: 1.3;
+  user-select: none; -webkit-user-select: none; touch-action: manipulation; min-width: 0;
+}
+.card:hover { box-shadow: var(--shadow); }
+.card .code { font-family: var(--f-mono); font-size: .7rem; opacity: .75; padding-top: 2px; flex: none; min-width: 2.2em; }
+.card .label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.card .used { flex: none; font-family: var(--f-mono); font-size: .68rem; background: var(--surface); color: var(--cink); border: 1px solid var(--edge); border-radius: 999px; padding: 0 6px; margin-top: 1px; }
+@media (pointer: fine) { .card { cursor: grab; } }
+.card.dragging-src { opacity: .35; }
+.ghost { position: fixed; z-index: 100; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,.25); transform: rotate(-1.5deg); opacity: .95; }
+
+.pairs { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.add-pair { align-self: flex-start; border: 1.5px dashed var(--line); background: none; color: var(--ink-soft); border-radius: 10px; padding: 8px 14px; font-weight: 700; }
+.add-pair:hover { border-color: var(--accent); color: var(--accent); }
+.pairs-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pairs-head h3 { font-size: 1.15rem; }
+.pairs-head .count { font-family: var(--f-mono); font-size: .75rem; color: var(--ink-soft); }
+.pair-list { display: flex; flex-direction: column; gap: 10px; }
+.pair { display: grid; grid-template-columns: 1.6em minmax(0,1fr) auto minmax(0,1fr) auto; gap: 6px 8px; align-items: center; padding: 8px; border-radius: 10px; background: var(--surface-2); }
+.pair .num { font-family: var(--f-mono); font-size: .75rem; color: var(--ink-soft); text-align: right; font-variant-numeric: tabular-nums; }
+.pair .link { color: var(--ink-soft); font-size: 1.1rem; }
+.pair.complete .link { color: var(--accent); font-weight: 700; }
+.slot { min-height: 46px; border-radius: 9px; border: 1.5px dashed var(--line); display: flex; align-items: stretch; min-width: 0; }
+.slot.empty { align-items: center; justify-content: center; color: var(--ink-soft); font-size: .78rem; padding: 6px; text-align: center; border-color: var(--edge); background: transparent; opacity: .8; }
+.slot.filled { border: none; }
+.slot.filled .card { height: 100%; }
+.slot.drop-hot { outline: 3px solid var(--edge); outline-offset: 1px; opacity: 1; }
+.pair .rm { border: none; background: none; color: var(--ink-soft); font-size: 1.15rem; line-height: 1; padding: 6px; border-radius: 6px; }
+.pair .rm:hover { color: var(--danger); background: var(--surface); }
+.pair .rm[hidden] { display: none; }
+.pair .note { grid-column: 2 / 5; width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 7px; padding: 6px 9px; font: inherit; font-size: .85rem; }
+.pair .note::placeholder { color: var(--ink-soft); }
+.pair-list.drop-hot { outline: 3px dashed var(--accent); outline-offset: 4px; border-radius: 10px; }
+.empty-msg { color: var(--ink-soft); font-size: .9rem; margin: 0; }
+
+.export { display: flex; flex-direction: column; gap: 8px; }
+.export textarea { width: 100%; min-height: 160px; font-family: var(--f-mono); font-size: .8rem; border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: var(--surface-2); color: var(--ink); }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%) translateY(20px);
+  background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 10px; font-size: .9rem; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 200; max-width: calc(100vw - 32px);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 900px) {
+  .board { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .pairs { grid-column: 1 / -1; order: -1; }
+  .bank { padding: 10px; }
+  .card { font-size: .82rem; padding: 6px 7px; }
+  .card .code { display: none; }
+}
+@media (max-width: 520px) {
+  .pair { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr) auto; }
+  .pair .num { display: none; }
+  .pair .note { grid-column: 1 / 4; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <!-- Picker -->
+  <section class="picker" id="picker">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span class="eyebrow">Group work · EU key competence frameworks</span>
+      <h1>Competence Match</h1>
+      <p class="lede">Choose two frameworks and press <strong>Start matching</strong>.</p>
+    </div>
+    <div class="fw-grid" id="fwGrid"></div>
+    <div class="picker-foot">
+      <button class="btn primary" id="startBtn" disabled>Start matching →</button>
+      <span class="hint" id="pickHint">Select two frameworks.</span>
+    </div>
+    <div class="quick" id="quick"><span class="hint">Session pairings:</span></div>
+  </section>
+
+  <!-- Board -->
+  <section id="boardView" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="toolbar">
+      <div class="title">
+        <span class="eyebrow">Arrange the related competences next to each other</span>
+        <h2 id="boardTitle"></h2>
+      </div>
+      <div class="actions">
+        <button class="btn" id="changeBtn">← Change frameworks</button>
+        <button class="btn" id="swapBtn" title="Swap left and right">⇄ Swap sides</button>
+        <button class="btn" id="clearBtn">Clear board</button>
+        <button class="btn primary" id="copyBtn">Copy my pairs</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <p class="lede" style="color:var(--ink)">Drag competences into pairs that feel related to you. Any combination is valid, and one competence can appear in several pairs. Add a short note to explain your thinking.</p>
+      <p class="hint" style="margin:0" id="howto">Drag a card from either side into the middle. On a touchscreen, tap a card on the left, then a card on the right, to make a pair. Make as many pairs as you like.</p>
+    </div>
+    <div class="board" id="board">
+      <div class="bank" id="bankA"></div>
+      <div class="pairs" id="pairsBox">
+        <div class="pairs-head"><h3>Your pairs</h3><span class="count" id="pairCount"></span></div>
+        <div class="pair-list" id="pairList" data-drop="list"></div>
+        <button class="add-pair" id="addPairBtn" type="button">+ Add another pair</button>
+        <div class="export" id="exportBox" hidden>
+          <span class="hint">Copying is blocked here. Select the text below and copy it yourself.</span>
+          <textarea id="exportText" readonly></textarea>
+        </div>
+      </div>
+      <div class="bank" id="bankB"></div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const FW = {
+  dig: { name: 'DigComp', full: 'Digital competence framework', cls: 'fw-dig', areas: [
+    ['1 · Information and data literacy', [['1.1','Search for information and digital content'],['1.2','Evaluation of digital content'],['1.3','Managing digital content']]],
+    ['2 · Communication and collaboration', [['2.1','Interacting through digital technologies'],['2.2','Sharing through digital technologies'],['2.3','Engaging citizenship through digital technologies'],['2.4','Collaborating through digital technologies'],['2.5','Netiquette'],['2.6','Managing digital identity']]],
+    ['3 · Digital content creation', [['3.1','Developing digital content'],['3.2','Integrating and re-elaborating digital content'],['3.3','Copyright and licences'],['3.4','Programming']]],
+    ['4 · Safety', [['4.1','Protecting devices'],['4.2','Protecting personal data and privacy'],['4.3','Protecting health and well-being'],['4.4','Protecting the environment']]],
+    ['5 · Problem solving', [['5.1','Solving technical problems'],['5.2','Identifying needs and technological responses'],['5.3','Creatively using digital technology'],['5.4','Identifying digital competence gaps']]],
+  ]},
+  grn: { name: 'GreenComp', full: 'Sustainability competence framework', cls: 'fw-grn', areas: [
+    ['1 · Embodying sustainability values', [['1.1','Valuing sustainability'],['1.2','Supporting fairness'],['1.3','Promoting nature']]],
+    ['2 · Embracing complexity', [['2.1','Systems thinking'],['2.2','Critical thinking'],['2.3','Problem framing']]],
+    ['3 · Envisioning sustainable futures', [['3.1','Futures literacy'],['3.2','Adaptability'],['3.3','Exploratory thinking']]],
+    ['4 · Acting for sustainability', [['4.1','Political agency'],['4.2','Collective action'],['4.3','Individual initiative']]],
+  ]},
+  ent: { name: 'EntreComp', full: 'Entrepreneurship competence framework', cls: 'fw-ent', areas: [
+    ['1 · Ideas and opportunities', [['1.1','Spotting opportunities'],['1.2','Creativity'],['1.3','Vision'],['1.4','Valuing ideas'],['1.5','Ethical and sustainable thinking']]],
+    ['2 · Resources', [['2.1','Self-awareness and self-efficacy'],['2.2','Motivation and perseverance'],['2.3','Mobilising resources'],['2.4','Financial and economic literacy'],['2.5','Mobilising others']]],
+    ['3 · Into action', [['3.1','Taking the initiative'],['3.2','Planning and management'],['3.3','Coping with uncertainty, ambiguity and risk'],['3.4','Working with others'],['3.5','Learning through experience']]],
+  ]},
+  lif: { name: 'LifeComp', full: 'Personal, social and learning-to-learn competence', cls: 'fw-lif', areas: [
+    ['Personal', [['P1','Self-regulation'],['P2','Flexibility'],['P3','Wellbeing']]],
+    ['Social', [['S1','Empathy'],['S2','Communication'],['S3','Collaboration']]],
+    ['Learning to learn', [['L1','Growth mindset'],['L2','Critical thinking'],['L3','Managing learning']]],
+  ]},
+};
+const ORDER = ['dig','grn','ent','lif'];
+const QUICK = [['lif','dig'],['dig','grn'],['dig','ent'],['ent','grn'],['lif','grn'],['lif','ent']];
+
+// lookup id -> {fw, code, label}
+const ITEMS = {};
+for (const k of ORDER) for (const [, list] of FW[k].areas) for (const [code, label] of list) ITEMS[k + ':' + code] = { fw: k, code, label };
+const countOf = k => FW[k].areas.reduce((n, a) => n + a[1].length, 0);
+
+// ---------- storage (best effort) ----------
+const store = {
+  get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
+  set(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} },
+};
+
+// ---------- state ----------
+let picked = [];          // framework keys in pick order
+let A = null, B = null;   // left / right framework keys
+let pairs = [];           // [{a, b, note}]
+
+const $ = id => document.getElementById(id);
+const boardKey = () => 'cm-board:' + [A, B].sort().join('+');
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ---------- picker ----------
+function renderPicker() {
+  const grid = $('fwGrid'); grid.innerHTML = '';
+  for (const k of ORDER) {
+    const f = FW[k], idx = picked.indexOf(k);
+    const b = document.createElement('button');
+    b.className = 'fw-tile ' + f.cls; b.id = 'tile-' + k;
+    b.setAttribute('aria-pressed', idx >= 0 ? 'true' : 'false');
+    b.innerHTML = `<span class="swatch"><i></i><i></i><i></i></span>
+      <span class="name">${f.name}</span><span class="full">${f.full}</span>
+      <span class="meta">${countOf(k)} competences · ${f.areas.length} areas</span>
+      ${idx >= 0 ? `<span class="order" aria-hidden="true">${idx === 0 ? 'L' : 'R'}</span>` : ''}`;
+    b.onclick = () => {
+      if (idx >= 0) picked.splice(idx, 1);
+      else { picked.push(k); if (picked.length > 2) picked.shift(); }
+      renderPicker();
+    };
+    grid.appendChild(b);
+  }
+  $('startBtn').disabled = picked.length !== 2;
+  $('pickHint').textContent = picked.length === 2
+    ? `${FW[picked[0]].name} on the left, ${FW[picked[1]].name} on the right.`
+    : picked.length === 1 ? 'Select one more framework.' : 'Select two frameworks.';
+}
+function renderQuick() {
+  const q = $('quick');
+  QUICK.forEach(([a, b]) => {
+    const c = document.createElement('button'); c.className = 'chip';
+    c.textContent = FW[a].name + ' + ' + FW[b].name;
+    c.onclick = () => { picked = [a, b]; openBoard(); };
+    q.appendChild(c);
+  });
+}
+
+// ---------- board ----------
+function openBoard() {
+  [A, B] = picked;
+  const saved = store.get(boardKey());
+  pairs = [];
+  if (saved && Array.isArray(saved.pairs)) {
+    const flip = saved.left !== A;
+    pairs = saved.pairs.map(p => flip ? { a: p.b, b: p.a, note: p.note || '' } : { a: p.a, b: p.b, note: p.note || '' })
+      .filter(p => (!p.a || ITEMS[p.a]) && (!p.b || ITEMS[p.b]));
+  }
+  normalize();
+  $('picker').hidden = true; $('boardView').hidden = false;
+  $('exportBox').hidden = true;
+  renderBoard();
+  store.set('cm-last', picked);
+  window.scrollTo(0, 0);
+}
+function closeBoard() { $('boardView').hidden = true; $('picker').hidden = false; renderPicker(); }
+
+let extraEmpty = 0; // empty rows the participant asked for with "Add another pair"
+function normalize() {
+  pairs = pairs.filter(p => p.a || p.b);
+  for (let i = 0; i <= extraEmpty; i++) pairs.push({ a: null, b: null, note: '' });
+}
+function save() { store.set(boardKey(), { left: A, pairs: pairs.filter(p => p.a || p.b) }); }
+
+function usage() {
+  const u = {};
+  for (const p of pairs) { if (p.a) u[p.a] = (u[p.a] || 0) + 1; if (p.b) u[p.b] = (u[p.b] || 0) + 1; }
+  return u;
+}
+
+function cardEl(id, origin) {
+  const it = ITEMS[id];
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = 'card ' + FW[it.fw].cls;
+  el.dataset.id = id;
+  el.dataset.origin = origin; // 'bank' or 'r{row}'
+  el.innerHTML = `<span class="code">${it.code}</span><span class="label">${it.label}</span>`;
+  return el;
+}
+
+function renderBank(side) {
+  const k = side === 'a' ? A : B, f = FW[k];
+  const box = $(side === 'a' ? 'bankA' : 'bankB');
+  box.className = 'bank ' + f.cls; box.dataset.drop = 'bank'; box.dataset.side = side;
+  box.innerHTML = `<div class="bank-head"><h3>${f.name}</h3><span>${countOf(k)} competences</span></div>`;
+  const u = usage();
+  for (const [area, list] of f.areas) {
+    const a = document.createElement('div'); a.className = 'area';
+    a.innerHTML = `<span class="area-name">${area}</span>`;
+    const cards = document.createElement('div'); cards.className = 'cards';
+    for (const [code] of list) {
+      const id = k + ':' + code, el = cardEl(id, 'bank');
+      if (u[id]) el.insertAdjacentHTML('beforeend', `<span class="used" title="Used in ${u[id]} pair(s)">×${u[id]}</span>`);
+      el.setAttribute('aria-label', `${ITEMS[id].label}. Add to a pair.`);
+      cards.appendChild(el);
+    }
+    a.appendChild(cards); box.appendChild(a);
+  }
+}
+
+function renderPairs() {
+  const list = $('pairList'); list.innerHTML = '';
+  pairs.forEach((p, i) => {
+    const row = document.createElement('div');
+    const complete = p.a && p.b;
+    row.className = 'pair' + (complete ? ' complete' : '');
+    const num = document.createElement('span'); num.className = 'num'; num.textContent = (p.a || p.b) ? (i + 1) : '+';
+    row.appendChild(num);
+    for (const side of ['a', 'b']) {
+      const k = side === 'a' ? A : B;
+      const slot = document.createElement('div');
+      slot.dataset.drop = 'slot'; slot.dataset.row = i; slot.dataset.side = side;
+      if (p[side]) { slot.className = 'slot filled'; slot.appendChild(cardEl(p[side], 'r' + i)); }
+      else { slot.className = 'slot empty ' + FW[k].cls; slot.textContent = FW[k].name; }
+      row.appendChild(slot);
+      if (side === 'a') { const l = document.createElement('span'); l.className = 'link'; l.textContent = '↔'; l.setAttribute('aria-hidden', 'true'); row.appendChild(l); }
+    }
+    const rm = document.createElement('button'); rm.className = 'rm'; rm.innerHTML = '×';
+    rm.title = 'Remove pair'; rm.setAttribute('aria-label', `Remove pair ${i + 1}`);
+    rm.hidden = !(p.a || p.b);
+    rm.onclick = () => { pairs.splice(i, 1); normalize(); save(); renderBoard(); };
+    row.appendChild(rm);
+    if (p.a || p.b) {
+      const note = document.createElement('input');
+      note.className = 'note'; note.id = 'note-' + i; note.type = 'text';
+      note.placeholder = 'Why do these belong together?';
+      note.value = p.note || '';
+      note.oninput = () => { p.note = note.value; save(); };
+      row.appendChild(note);
+    }
+    list.appendChild(row);
+  });
+  const done = pairs.filter(p => p.a && p.b).length;
+  $('pairCount').textContent = done === 1 ? '1 pair' : done + ' pairs';
+}
+
+function renderBoard() {
+  const fa = FW[A], fb = FW[B];
+  $('boardTitle').innerHTML = `<span class="tag ${fa.cls}">${fa.name}</span><span class="x">+</span><span class="tag ${fb.cls}">${fb.name}</span>`;
+  renderBank('a'); renderBank('b'); renderPairs();
+}
+
+// ---------- placement logic ----------
+const sideOf = id => ITEMS[id].fw === A ? 'a' : 'b';
+
+function place(id, row, fromRow) {
+  const side = sideOf(id);
+  if (fromRow != null && fromRow === row) return;
+  const target = pairs[row];
+  const displaced = target[side];
+  target[side] = id;
+  if (fromRow != null) pairs[fromRow][side] = displaced || null; // move (swap if occupied)
+  extraEmpty = 0;
+  normalize(); save(); renderBoard();
+}
+function autoPlace(id) {
+  const side = sideOf(id), other = side === 'a' ? 'b' : 'a';
+  let row = pairs.findIndex(p => !p[side] && p[other]);
+  if (row < 0) row = pairs.length - 1;
+  place(id, row, null);
+  const p = pairs[row];
+  const rowEl = $('pairList').children[row];
+  if (rowEl) { const r = rowEl.getBoundingClientRect(); if (r.top < 0 || r.bottom > window.innerHeight) rowEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  toast(p.a && p.b ? `Pair ${row + 1} made` : `Now pick a ${FW[side === 'a' ? B : A].name} card for pair ${row + 1}`);
+}
+function removeFrom(row, side) { pairs[row][side] = null; normalize(); save(); renderBoard(); }
+
+// ---------- pointer drag (mouse & pen); taps / Enter add cards ----------
+let drag = null;
+document.addEventListener('pointerdown', e => {
+  const card = e.target.closest('.card');
+  if (!card || e.button !== 0 || e.pointerType === 'touch') return;
+  drag = { card, id: card.dataset.id, origin: card.dataset.origin, x: e.clientX, y: e.clientY, started: false };
+});
+document.addEventListener('pointermove', e => {
+  if (!drag) return;
+  if (!drag.started) {
+    if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+    drag.started = true;
+    const r = drag.card.getBoundingClientRect();
+    drag.dx = drag.x - r.left; drag.dy = drag.y - r.top;
+    drag.ghost = drag.card.cloneNode(true);
+    drag.ghost.classList.add('ghost'); drag.ghost.style.width = r.width + 'px';
+    document.body.appendChild(drag.ghost);
+    drag.card.classList.add('dragging-src');
+    document.body.style.cursor = 'grabbing';
+  }
+  e.preventDefault();
+  drag.ghost.style.left = (e.clientX - drag.dx) + 'px';
+  drag.ghost.style.top = (e.clientY - drag.dy) + 'px';
+  highlight(targetAt(e.clientX, e.clientY));
+  // edge autoscroll
+  const m = 60, h = window.innerHeight;
+  if (e.clientY < m) window.scrollBy(0, -12); else if (e.clientY > h - m) window.scrollBy(0, 12);
+  const pb = $('pairsBox'), pr = pb.getBoundingClientRect();
+  if (e.clientX > pr.left && e.clientX < pr.right) {
+    if (e.clientY < pr.top + 40) pb.scrollTop -= 10; else if (e.clientY > pr.bottom - 40) pb.scrollTop += 10;
+  }
+}, { passive: false });
+document.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (!d.started) return; // a plain click is handled by the click handler
+  d.ghost.remove(); d.card.classList.remove('dragging-src'); document.body.style.cursor = '';
+  highlight(null);
+  suppressNextClick = true; setTimeout(() => { suppressNextClick = false; }, 0);
+  drop(d, targetAt(e.clientX, e.clientY));
+});
+document.addEventListener('pointercancel', () => {
+  if (drag && drag.started) { drag.ghost.remove(); drag.card.classList.remove('dragging-src'); highlight(null); document.body.style.cursor = ''; }
+  drag = null;
+});
+let suppressNextClick = false;
+document.addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  if (suppressNextClick) { suppressNextClick = false; return; }
+  if (card.dataset.origin === 'bank') autoPlace(card.dataset.id);
+}, true);
+document.addEventListener('keydown', e => {
+  const card = e.target.closest && e.target.closest('.card');
+  if (card && card.dataset.origin !== 'bank' && (e.key === 'Delete' || e.key === 'Backspace')) {
+    removeFrom(+card.dataset.origin.slice(1), sideOf(card.dataset.id));
+  }
+});
+
+function targetAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  return el ? el.closest('[data-drop]') : null;
+}
+let hot = null;
+function highlight(t) {
+  if (hot === t) return;
+  if (hot) hot.classList.remove('drop-hot');
+  hot = t;
+  if (!t || !drag) { hot = t; return; }
+  // only highlight sensible targets
+  const side = sideOf(drag.id);
+  if (t.dataset.drop === 'bank' && (drag.origin === 'bank' || t.dataset.side !== side)) { hot = null; return; }
+  t.classList.add('drop-hot');
+}
+function drop(d, t) {
+  if (!t) return;
+  const side = sideOf(d.id);
+  const fromRow = d.origin === 'bank' ? null : +d.origin.slice(1);
+  if (t.dataset.drop === 'bank') {
+    if (fromRow != null) removeFrom(fromRow, side);
+    return;
+  }
+  if (t.dataset.drop === 'slot') {
+    const row = +t.dataset.row;
+    place(d.id, row, fromRow);
+    return;
+  }
+  if (t.dataset.drop === 'list') {
+    // dropped in empty space of the pairs area: start a new pair
+    const row = pairs.length - 1;
+    place(d.id, row, fromRow);
+  }
+}
+
+// ---------- toolbar ----------
+$('startBtn').onclick = openBoard;
+$('addPairBtn').onclick = () => {
+  extraEmpty = Math.min(extraEmpty + 1, 5); normalize(); renderBoard();
+  const rows = $('pairList').children; rows[rows.length - 1].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+};
+$('changeBtn').onclick = closeBoard;
+$('swapBtn').onclick = () => {
+  picked = [B, A];
+  pairs = pairs.map(p => ({ a: p.b, b: p.a, note: p.note }));
+  [A, B] = picked; save(); store.set('cm-last', picked); renderBoard();
+};
+let clearArmed = false;
+$('clearBtn').onclick = () => {
+  const btn = $('clearBtn');
+  if (!clearArmed) {
+    clearArmed = true; btn.classList.add('danger-armed'); btn.textContent = 'Click again to clear';
+    setTimeout(() => { clearArmed = false; btn.classList.remove('danger-armed'); btn.textContent = 'Clear board'; }, 3000);
+    return;
+  }
+  clearArmed = false; btn.classList.remove('danger-armed'); btn.textContent = 'Clear board';
+  pairs = []; normalize(); save(); renderBoard(); toast('Board cleared');
+};
+function exportText() {
+  const done = pairs.filter(p => p.a && p.b);
+  const lines = [`${FW[A].name} ↔ ${FW[B].name} — ${done.length} pair${done.length === 1 ? '' : 's'}`, ''];
+  done.forEach((p, i) => {
+    lines.push(`${i + 1}. ${ITEMS[p.a].label} (${ITEMS[p.a].code}) ↔ ${ITEMS[p.b].label} (${ITEMS[p.b].code})`);
+    if (p.note && p.note.trim()) lines.push(`   Why: ${p.note.trim()}`);
+  });
+  return lines.join('\n');
+}
+$('copyBtn').onclick = () => {
+  const txt = exportText();
+  if (!pairs.some(p => p.a && p.b)) { toast('Make at least one pair first'); return; }
+  const fallback = () => { $('exportBox').hidden = false; const ta = $('exportText'); ta.value = txt; ta.focus(); ta.select(); };
+  try {
+    navigator.clipboard.writeText(txt).then(() => toast('Pairs copied. Paste them into the chat.'), fallback);
+  } catch (e) { fallback(); }
+};
+
+// ---------- boot ----------
+const last = store.get('cm-last');
+if (Array.isArray(last) && last.length === 2 && FW[last[0]] && FW[last[1]]) picked = last.slice();
+renderPicker(); renderQuick();
+if ('ontouchstart' in window && !matchMedia('(pointer: fine)').matches) {
+  $('howto').textContent = 'Tap a card on one side, then a card on the other side, to make a pair. Tap × to remove a pair.';
+}
+</script>
+
+</body></html>
