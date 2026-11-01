@@ -1,0 +1,566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Scaffold Competence Cards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: two views under one sticky bar. Cards = wrapping grid with links; Exercise = chosen set side by side, a link map, then a worksheet */
+:root{
+  --bg:#f3f4f2; --surface:#ffffff; --sunk:#eaedeb; --fg:#22302f; --muted:#5d6b69; --line:#d9dedb;
+  --dig:#e4572e; --dig2:#f08a24; --ent:#6a2a72; --ent2:#b62b88; --life:#93b52a; --life2:#b9d43a; --green:#13996a; --green2:#4cb65c;
+  --teal:#12a3a0; --ring:#22302f; --tip:#8e1b17;
+  --f-display:"League Spartan","Futura","Trebuchet MS",sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a19; --surface:#1d2524; --sunk:#182020; --fg:#e7ecea; --muted:#9aa8a5; --line:#33403e;
+  --teal:#3fd0cc; --ring:#e7ecea; --tip:#ff8a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a19; --surface:#1d2524; --sunk:#182020; --fg:#e7ecea; --muted:#9aa8a5; --line:#33403e;
+  --teal:#3fd0cc; --ring:#e7ecea; --tip:#ff8a7a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1400px;margin:0 auto}
+header.top{padding-block:28px 8px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:.95;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{color:var(--muted);max-width:70ch;margin:10px 0 0}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:10px}
+.modes{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:stretch;width:100%}
+.mode{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 14px;border:2px solid var(--ring);border-radius:8px;background:var(--surface);color:var(--fg);cursor:pointer;min-width:0}
+.mode:hover{background:var(--sunk)}
+.mode .n{font:800 1.1rem/1 var(--f-display);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:2px solid currentColor;flex:none}
+.mode .tx{min-width:0}
+.mode b{display:block;font:800 1.15rem/1.1 var(--f-display)}
+.mode small{display:block;color:var(--muted);font-size:12.5px;line-height:1.25;margin-top:2px}
+.mode[aria-selected="true"]{background:var(--ring);color:var(--bg);cursor:default}
+.mode[aria-selected="true"] small{color:inherit;opacity:.8}
+.mode[aria-selected="true"]::after{content:"You are here";margin-left:auto;font:700 11px/1 var(--f-body);text-transform:uppercase;letter-spacing:.08em;opacity:.75;flex:none}
+@media (max-width:560px){.mode[aria-selected="true"]::after{display:none}.mode{padding:8px 10px}}
+.modes .arr{align-self:center;font:800 1.4rem var(--f-display);color:var(--muted)}
+.tray{width:100%;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:8px 12px;border-radius:8px;background:color-mix(in srgb,var(--teal) 14%,var(--surface));border:1.5px solid var(--teal)}
+.tray .tl{font:800 1rem/1 var(--f-display)}
+.tray .num{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:999px;background:var(--teal);color:#fff;font:800 15px/1 var(--f-display);margin-left:4px}
+.tray .chips{flex:1 1 200px;min-width:0}
+body.nodl .pdfbtn{display:none!important}
+.exhelp{margin:0;color:var(--muted);font-size:13.5px;max-width:75ch}
+.modefoot{margin-top:34px;padding-block:18px;border-top:2px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.goex{position:fixed;z-index:6;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font:800 1rem/1 var(--f-display);background:var(--teal);color:#fff;border:0;border-radius:999px;padding:14px 20px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.goex:hover{filter:brightness(1.08)}
+.count{display:inline-block;min-width:20px;padding:2px 6px;border-radius:999px;background:var(--teal);color:#fff;font-size:12px;margin-left:4px}
+.filters{display:contents}
+.filters[hidden]{display:none!important}
+.fw{font:600 13px/1 var(--f-body);border:1.5px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 12px;border-radius:999px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.fw .dot{width:10px;height:10px;border-radius:50%}
+.fw[aria-pressed="true"]{border-color:var(--ring);box-shadow:inset 0 0 0 1px var(--ring)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+#q{flex:1 1 200px;min-width:0;font:15px var(--f-body);padding:8px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg)}
+.status{width:100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.status b{color:var(--fg)}
+.btn{font:700 13px var(--f-body);background:var(--surface);border:1.5px solid var(--line);color:var(--fg);border-radius:6px;padding:7px 12px;cursor:pointer}
+.btn.primary{background:var(--ring);border-color:var(--ring);color:var(--bg)}
+.btn:hover{border-color:var(--ring)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding-block:12px 4px;font-size:13px;color:var(--muted);align-items:center}
+.tv{display:inline-flex;gap:5px;align-items:center;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:2px 0}
+.tv[aria-pressed="true"]{color:var(--fg);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.tv svg,.shapes svg{width:15px;height:15px;stroke:var(--teal);fill:none;stroke-width:1.8}
+section.group{padding-block:22px 6px}
+.gtitle{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin:0 0 12px}
+.gtitle h2{font-family:var(--f-display);font-weight:800;font-size:1.5rem;margin:0}
+.gtitle span{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;overflow:hidden;scroll-margin-top:130px;transition:opacity .2s,box-shadow .2s;min-width:0}
+.cardhead{all:unset;cursor:pointer;display:block;padding:14px 16px 16px;color:#fff;background:linear-gradient(120deg,var(--c1),var(--c2))}
+.cardhead:focus-visible{outline:2px solid var(--teal);outline-offset:-4px}
+.cardhead .code{font:800 1rem/1 var(--f-display);float:right;margin-left:8px}
+.cardhead h3{font:800 1.15rem/1.05 var(--f-display);text-transform:uppercase;margin:0;letter-spacing:.01em;text-wrap:balance}
+.card[data-fw="life"] .cardhead{color:#1f2a05}
+.body{padding:12px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.lbl{font:700 11px/1 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font:700 12px/1 var(--f-body);border:0;border-radius:4px;padding:5px 7px;cursor:pointer;color:#fff;background:var(--cc)}
+.chip[data-fw="life"]{color:#1f2a05}
+.chip.rev,.chip.rev[data-fw="life"]{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--cc)}
+.chip.in{outline:2px solid var(--ring);outline-offset:1px}
+.desc{margin:0}
+.act{margin-top:auto;border-top:1px dashed var(--line);padding-top:10px;font-style:italic}
+.act .lbl{font-style:normal}
+.shapes{display:flex;gap:4px;align-items:center;flex:none}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pick{align-self:flex-start;font:700 12px var(--f-body);border:1.5px dashed var(--line);background:none;color:var(--muted);border-radius:6px;padding:6px 10px;cursor:pointer}
+.pick[aria-pressed="true"]{border-style:solid;border-color:var(--teal);color:var(--fg);background:color-mix(in srgb,var(--teal) 14%,transparent)}
+body.focusing .card.dim{opacity:.22}
+.card.sel{box-shadow:0 0 0 3px var(--ring)}
+.card.flash{animation:flash 1.2s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 5px var(--teal)}100%{box-shadow:0 0 0 0 transparent}}
+.empty{color:var(--muted);padding:30px 0}
+
+/* Exercise view */
+#exView{padding-block:20px 10px;display:flex;flex-direction:column;gap:26px}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.task h2{font:800 1.6rem/1.05 var(--f-display);margin:0}
+.task p{margin:0;font-size:1.08rem;max-width:70ch}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.setcode{font-size:13px;color:var(--muted)}
+.setcode code{font:13px ui-monospace,Menlo,Consolas,monospace;background:var(--sunk);padding:2px 6px;border-radius:4px;color:var(--fg);user-select:all}
+.exgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.exgrid .act{font-style:italic;margin:0 -16px -14px;padding:12px 16px 14px;border-top:0;background:color-mix(in srgb,var(--c1) 12%,var(--surface));box-shadow:inset 0 0 0 2.5px var(--tip)}
+.exgrid .remove{font:700 12px var(--f-body);background:none;border:0;color:var(--muted);cursor:pointer;padding:0;text-decoration:underline;align-self:flex-start}
+.blank{border:2px dashed var(--line);border-radius:8px;padding:26px;color:var(--muted);text-align:center}
+h3.sec{font:800 1.25rem/1.1 var(--f-display);margin:0 0 10px}
+.links{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:720px){.links{grid-template-columns:1fr}}
+.map{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px}
+.map svg{width:100%;height:auto;display:block}
+.map .edge{stroke:var(--fg);fill:none}
+.map .lab{font:800 15px var(--f-display);fill:#fff;text-anchor:middle;dominant-baseline:central}
+.map .lab.dark{fill:#1f2a05}
+.linklist{display:flex;flex-direction:column;gap:12px;min-width:0}
+.linklist ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.hint{color:var(--muted);font-size:13px;margin:0}
+.ws{display:flex;flex-direction:column;gap:18px}
+.activity{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.activity header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.activity h4{font:800 1.15rem var(--f-display);margin:0}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.fields{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f.wide{grid-column:1/-1}
+.f label{font:700 12px/1.2 var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.f label small{text-transform:none;letter-spacing:0;font-weight:400}
+input.t,textarea,select{font:15px/1.4 var(--f-body);color:var(--fg);background:var(--sunk);border:1.5px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:64px}
+.comp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.comp .f label{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;font-size:13px;color:var(--fg)}
+.comp .sw{width:10px;height:10px;border-radius:2px;flex:none;background:var(--cc)}
+.saved{font-size:12px;color:var(--muted)}
+footer{color:var(--muted);font-size:12px;padding-block:20px 90px}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card.flash{animation:none;box-shadow:0 0 0 3px var(--teal)}}
+</style>
+
+<header class="top wrap">
+  <h1>Scaffold<br>Competence Cards</h1>
+  <p class="lede">All 57 competence cards from the ETF Scaffold toolkit. Tap a code under <b>Good with</b> to jump to that card, or a card's coloured header to see its connections. Use <b>Select for exercise</b> on any cards, then open <b>Exercise</b> to design activities that connect them.</p>
+  <div class="actions pdfbtn" style="margin-top:12px"><button class="btn" id="pdfAll">Download all cards as PDF</button><span class="saved" id="pdfAllNote" role="status"></span></div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="modes" data-modes></div>
+    <div class="tray" id="tray" hidden></div>
+    <div class="filters" id="filters">
+      <button class="fw" data-f="all" aria-pressed="true">All</button>
+      <button class="fw" data-f="dig" aria-pressed="false"><span class="dot" style="background:var(--dig)"></span>DigComp</button>
+      <button class="fw" data-f="ent" aria-pressed="false"><span class="dot" style="background:var(--ent)"></span>EntreComp</button>
+      <button class="fw" data-f="life" aria-pressed="false"><span class="dot" style="background:var(--life)"></span>LifeComp</button>
+      <button class="fw" data-f="green" aria-pressed="false"><span class="dot" style="background:var(--green)"></span>GreenComp</button>
+      <input id="q" type="search" placeholder="Search titles, descriptions, activities…" aria-label="Search cards">
+      <div class="status" id="status" hidden></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="cardsView">
+    <div class="legend" id="legend"><span>Transversal competences (where marked on the printed card):</span></div>
+    <main id="main"></main>
+  </div>
+  <div id="exView" hidden></div>
+  <section class="modefoot"><div class="lbl">Switch mode</div><div class="modes" data-modes></div></section>
+  <button class="goex" id="goEx" hidden>Go to exercise →</button>
+  <footer>Content: SCAFFOLD printable version, European Training Foundation / European Commission. Transversal-competence markers are shown only where the printed cards include them. Worksheet drafts are saved in this browser only.</footer>
+</div>
+
+<script>
+const FW={
+  dig:{name:"DigComp",sub:"Digital competence · 21 cards",c1:"var(--dig)",c2:"var(--dig2)"},
+  ent:{name:"EntreComp",sub:"Entrepreneurship competence · 15 cards",c1:"var(--ent)",c2:"var(--ent2)"},
+  life:{name:"LifeComp",sub:"Personal, social & learning-to-learn · 9 cards",c1:"var(--life)",c2:"var(--life2)"},
+  green:{name:"GreenComp",sub:"Sustainability competence · 12 cards",c1:"var(--green)",c2:"var(--green2)"}
+};
+const TV={
+  CT:{n:"Critical thinking",s:'<polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6"/>'},
+  PS:{n:"Problem solving",s:'<circle cx="12" cy="12" r="9"/>'},
+  AN:{n:"Analytical skills",s:'<rect x="3.5" y="3.5" width="17" height="17"/>'},
+  CR:{n:"Creativity",s:'<path d="M12 20.5 3.6 12.3A5 5 0 0 1 12 6a5 5 0 0 1 8.4 6.3Z"/>'},
+  CN:{n:"Communication & negotiation",s:'<polygon points="7,3 17,3 22,12 17,21 7,21 2,12"/>'},
+  IC:{n:"Intercultural skills",s:'<polygon points="12,3 21.5,20 2.5,20"/>'},
+  TW:{n:"Team work",s:'<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" transform="rotate(45 12 12)"/>'}
+};
+const METHODS=["Project-based learning","Learner-led learning","Value creation pedagogy","Cooperative learning","Seriously playful learning","Laboratory learning","Service learning"];
+const ASSESS=["Peer feedback","Self-reflection","Generating assessment evidence","Authentic assessment","Automated assessment","Observation","Questions for learning"];
+const C=[
+["d.1","Searching information and digital content","e.1 g.5","Develop personal strategies to identify information needs, search and navigate information in digital environments.","Search the internet for information about a topic.","CT AN"],
+["d.2","Evaluating digital content","g.5","Critically evaluate the sources of data and content.","Identify who is behind the information to spot and verify fake news.",""],
+["d.3","Managing digital content","e.12","Organise, store and retrieve data, information and content in digital environments.","Organise your digital files in a logical structure.","PS AN"],
+["d.4","Interacting through digital technologies","e.14 g.11 l.5 l.6","Use a variety of digital technologies and understand appropriate digital communication means for a given context.","Select and use appropriate digital tools for your purpose and context.",""],
+["d.5","Sharing through digital technologies","e.14","Share data, information and digital content. Provide referencing and attribution.","Share relevant content giving credit to the authors.","CN TW AN"],
+["d.6","Engaging in citizenship through digital technologies","g.10 g.11 g.12","Use public and private digital services to empower yourself and participate as a citizen.","Use digital technologies to contribute responsibly and participate respectfully in your community.","CR IC"],
+["d.7","Collaborating digitally","e.8 e.14 g.11 l.6","Use collaborative digital tools and technologies to create resources and knowledge.","Work together on a project using digital tools.","CN TW PS"],
+["d.8","Netiquette","l.1 l.5 l.6","Adapt personal communication strategies to the specific audience and be aware of diversity in digital environments.","Treat people with respect and consideration online.",""],
+["d.9","Managing digital identity","l.1 l.3","Create and manage digital identities and footprints.","Explore your digital profiles to protect your privacy and reputation.",""],
+["d.10","Developing digital content","e.2","Create and edit digital content in different formats, express through digital means.","Create a digital product to complete a task or express yourself.",""],
+["d.11","Re-elaborating digital content","e.1 e.2","Modify and integrate information/image/data into an existing digital file to create new and relevant content.","Work on someone else’s content to update or improve it.","PS CR"],
+["d.12","Copyright and licences","e.4","Understand how copyright and licences apply to data, information and digital content.","Check the need for permission to use external content and apply the correct permission to your own work.",""],
+["d.13","Programming","e.2 g.6 g.9","Develop a sequence of instructions for a computing system to solve a given problem or perform a specific task.","Create a program to complete a task or express yourself.","PS AN CR"],
+["d.14","Protecting devices","e.12 l.8","Protect devices and digital content, understand risks and security measures, use appropriate safety measures.","Use safety measures to protect digital devices and content.",""],
+["d.15","Protecting personal data","l.3 l.8","Protect personal data and privacy in digital environments, understand that digital services use a “Privacy policy” to inform how personal data is used.","Identify your rights and responsibilities relating to personal data.","CT"],
+["d.16","Protecting health and well-being","g.3 l.3 l.8","Avoid threats to physical, psychological and social well-being while using digital technologies.","Create tips to use digital technologies in a way that supports your physical, psychological and social well-being.",""],
+["d.17","Protecting the environment","g.3","Be aware of the environmental impact of digital devices, technologies and their use.","Identify the environmental impact of your digital technologies.","CT"],
+["d.18","Solving technical problems","g.6","Identify technical problems in devices and in digital environments, and solve them.","Identify common technical issues and create a guide to solve them.","CT AN CR"],
+["d.19","Identifying needs and technological responses","e.1 e.2 g.6 g.9","Use and customise digital tools and environments to meet identified needs, and promote accessibility.","Identify a need and find or suggest a digital tool to address it.","PS AN CR"],
+["d.20","Creatively using digital technologies","e.1 e.2 g.6 g.9","Use digital technologies to create knowledge and innovative processes and products. Understand and resolve problems in digital environments.","Use digital technologies to express your ideas or create value.","PS AN CR"],
+["d.21","Identifying digital competence gaps","e.6 e.15 l.9","Understand and improve own digital competence. Support others with their digital competence development.","Self assess your digital competence and create a list of opportunities to improve them.",""],
+["e.1","Spotting opportunities","d.1 d.11 d.19 d.20 g.4 g.5 g.6 g.10 l.8","Analyse the social, cultural and economic landscape to identify needs and challenges and seize opportunities to create value.","Find and describe an environmental challenge to be addressed in your community.","CT PS AN"],
+["e.2","Creativity","d.10 d.11 d.13 d.19 d.20 g.4 g.5 g.6 g.9","Develop creative and purposeful ideas to create valuable effects.","Find 50 ways to use a pencil.",""],
+["e.3","Vision","l.2 g.7 g.9 g.10","Imagine the future to help guide effort and turn ideas into action.","Design a vision board of the future in 20 years.","CR"],
+["e.4","Valuing ideas","d.12 g.5","Recognize social, cultural and economic value of ideas and consider how to share it and/or protect it.","Make a SWOT analysis of an idea or project.",""],
+["e.5","Ethical and sustainable thinking","g.1 g.2 g.3 g.4 l.3","Behave ethically and think sustainably by assessing the impact of your actions and consider yourself accountable for those.","Compare three different ways to go on holidays and evaluate their sustainability.","CT"],
+["e.6","Self-awareness and self-efficacy","d.21 g.12 l.1 l.7","Identify your individual and group strengths and weaknesses to build self-belief and shape your future in line with your needs, interest and aspirations.","Assess your skills and develop a plan to achieve your short, mid and long term goals.",""],
+["e.7","Motivation and perseverance","l.1 l.7","Be resilient, stay focused and determined and don’t give up despite adversities and temporary failure.","List different strategies to motivate yourself and others to overcome challenges.",""],
+["e.8","Mobilising resources","d.7","Get support and manage material and non material resources, make the most of your time.","List the resources needed for a project and assign roles.",""],
+["e.9","Financial and economic literacy","g.1 g.2 g.3 l.3","Understand economic and financial concepts to define budget, find funding and create sustainable value.","Analyse the business model of a well known company.",""],
+["e.10","Mobilising others","l.5 g.11 g.10","Inspire and persuade relevant stakeholders to get support, communicate effectively through different media.","Prepare an elevator pitch for a new business idea.",""],
+["e.11","Taking the initiative","g.10 g.11 g.12","Work independently and take action to achieve goals, stick to intentions and carry out planned tasks.","Identify the first steps towards a shared goal and guide others.","PS"],
+["e.12","Planning and management","d.3 d.14 g.7 g.8 l.2","Define priorities and action plans to achieve goals and adapt to unforeseen changes.","Imagine a worst case scenario about a matter and think how it could be solved.",""],
+["e.13","Coping with uncertainty, ambiguity and risk","g.8 l.2","Calculate and manage risks related to decisions and be ready to change plans according to the result.","Adopt an agile-design approach to complete a task.",""],
+["e.14","Working with others","d.4 d.5 d.7 g.11 l.4 l.6","Work together and co-operate with others to develop ideas and turn them into action.","Brainstorm ideas and define roles to realize the project.",""],
+["e.15","Learning through experience","l.7 l.8 l.9 d.21","Learn together with peers and mentors and reflect on success and failure to value experience.","Draw up a balance of the actions taken to create something and identify the improvement areas.","CT"],
+["l.1","Self regulation","d.8 d.9 e.6 e.7 g.1 g.10 g.12","Develop awareness and management of emotions, thoughts and behaviour.","Label your emotions and set strategies to manage your behaviour.",""],
+["l.2","Flexibility","e.3 e.12 e.13 g.8","Manage transitions and uncertainty and face challenges.","Explore new ways of doing and adapt your approach.",""],
+["l.3","Well being","d.9 d.15 d.16 e.5 e.9 g.1 g.3","Pursue life satisfaction; take care of physical, mental and social health; adopt a sustainable lifestyle.","Create tips to take care of your physical, social and psychological well-being.",""],
+["l.4","Empathy","e.14 g.1 g.2 g.3","Understand another person’s emotions, experiences and values, and respond appropriately.","Engage in a conversation with someone you do not know and find out three pieces of information (e.g. the best teacher they had, something they are proud of, what they would change if they had no constraints).",""],
+["l.5","Communication","d.4 d.8 e.10","Use communication strategies, domain-specific codes and tools, depending on the context and content.","Practice storytelling.","CN IC"],
+["l.6","Collaboration","d.4 d.7 d.8 e.14 g.11","Engage in group activity and teamwork respecting others.","Set team goals and rules to encourage everybody’s contribution.","TW CN"],
+["l.7","Growth mind-set","e.6 e.7 e.15","Believe in one’s and others’ potential to continuously learn and progress.","Cherish your mistakes as growth opportunities.","CT"],
+["l.8","Critical thinking","d.14 d.15 d.16 e.1 e.15 g.4 g.5 g.6","Assess information to develop reasoned conclusions and innovative solutions.","Debate solutions to controversial problems.","CT PS AN CR IC"],
+["l.9","Managing learning","d.21 e.15","Plan, organise, monitor and review one’s own learning.","Keep a learning journal to reflect on your progress.","CT PS AN"],
+["g.1","Valuing sustainability","e.5 e.9 l.1 l.3 l.4","Reflect on personal values, how they vary among people and over time, and how they align with sustainability values.","Discuss if a selfish person can appreciate sustainability thinking where society and planet should be above the single person.","CT CN IC"],
+["g.2","Supporting fairness","e.5 e.9 l.4","Support equity and justice for current and future generations and learn from the past.","Look for a case of environmental injustice (e.g. forest converted to crop fields) and discuss how to change it.","IC"],
+["g.3","Promoting nature","d.16 d.17 e.5 e.9 l.3 l.4","Respect the needs and rights of other species and nature in order to regenerate healthy and resilient ecosystems.","Watch a video on intensive livestock farming and discuss the issue of animal wellbeing.",""],
+["g.4","Systems thinking","e.1 e.2 e.5 l.8","Approach a sustainability problem considering context to understand how elements within systems interact.","Pick a food item from your pantry and trace it back following its lifecycle, taking into consideration its origin, the conditions of farmers, likely climate change impacts, packaging involved, its end of life, its nutritional value…","CT AN IC"],
+["g.5","Critical thinking","l.8 d.1 d.2 e.1 e.2 e.4","Assess information to develop reasoned conclusions and innovative solutions for the environment.","Debate solutions to controversial environmental problems.","CT"],
+["g.6","Problem framing","d.13 d.18 d.19 d.20 e.1 e.2 l.8","Present challenges as a sustainability problem in terms of difficulty, actors, time and geographical scope, and identify appropriate approaches.","Create alternative and sustainable user journeys for everyday life tasks (i.e. going to school).","PS"],
+["g.7","Futures literacy","e.3 e.12","Imagine alternative sustainable futures and identify the steps to achieve them.","Do a world-building set in the distant future of Earth.","PS CR"],
+["g.8","Adaptability","e.12 e.13 l.2","Consider risk and ambiguity to manage transitions of complex situations.","Imagine an environmental worst case scenario and think how it will affect life.",""],
+["g.9","Exploratory thinking","d.13 d.19 d.20 e.2 e.3","Explore and link different disciplines, using creativity and experimentation with new ideas or methods.","Create three different solutions to a single environmental problem.","CR"],
+["g.10","Political agency","d.6 e.1 e.3 e.10 e.11 l.1","Identify political responsibility and accountability on unsustainable behaviours and demand effective policies for sustainability.","Research who’s responsible for recycling in your city and how to contact them.",""],
+["g.11","Collective action","d.4 d.6 d.7 e.10 e.11 e.14 l.6","Demand and act for change in collaboration with others.","Prepare together a speech to be held in public to ask for sustainable actions.","TW"],
+["g.12","Individual initiative","d.6 e.6 e.11 l.1","Identify own potential for sustainability and to actively contribute to improving the community and the planet.","Reflect and write down practical everyday action to improve your community.","CN"]
+];
+const fwOf=c=>({d:"dig",e:"ent",l:"life",g:"green"})[c[0]];
+const idOf=c=>c.replace(".","");
+const cards=C.map(([code,title,gw,desc,act,tv])=>({code,title,gw:gw.split(" ").filter(Boolean),desc,act,tv:tv.split(" ").filter(Boolean),fw:fwOf(code)}));
+const byCode=Object.fromEntries(cards.map(c=>[c.code,c]));
+cards.forEach(c=>c.rev=[]);
+cards.forEach(c=>c.gw.forEach(t=>{const o=byCode[t];if(o&&!o.gw.includes(c.code))o.rev.push(c.code)}));
+const nb=c=>new Set([...byCode[c].gw,...byCode[c].rev]);
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[m]);
+const shape=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${TV[k].s}</svg>`;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- state ---------- */
+let picked=store.get("scaffold.set",[]).filter(c=>byCode[c]);
+let filt="all",q="",tvF=null,sel=null,view="cards";
+const EXAMPLE=["g.12","l.1","d.6","e.11"];
+
+/* ---------- cards view ---------- */
+const legend=document.getElementById("legend");
+Object.entries(TV).forEach(([k,v])=>{const b=document.createElement("button");b.className="tv";b.dataset.tv=k;b.setAttribute("aria-pressed","false");b.innerHTML=shape(k)+esc(v.n);legend.appendChild(b)});
+const chip=(code,rev)=>{const t=byCode[code];return `<button class="chip${rev?" rev":""}" data-go="${code}" data-fw="${t.fw}" style="--cc:${FW[t.fw].c1}" title="${esc(t.title)}">${code}</button>`};
+function cardHTML(c,mode){
+  const f=FW[c.fw];
+  return `<article class="card" ${mode==="ex"?"":`id="${idOf(c.code)}"`} data-code="${c.code}" data-fw="${c.fw}" style="--c1:${f.c1};--c2:${f.c2}">
+    <button class="cardhead" ${mode==="ex"?`data-go="${c.code}" aria-label="Show ${esc(c.title)} in the card list"`:`data-sel="${c.code}" aria-label="Highlight ${esc(c.title)} and its connections"`}><span class="code">${c.code}</span><h3>${esc(c.title)}</h3></button>
+    <div class="body">
+      <div class="row"><div><div class="lbl">Good with</div><div class="chips">${c.gw.map(g=>mode==="ex"&&picked.includes(g)?chip(g).replace('class="chip"','class="chip in"'):chip(g)).join("")}</div></div>
+      ${c.tv.length?`<div class="shapes" title="${c.tv.map(t=>TV[t].n).join(", ")}" aria-label="Transversal: ${c.tv.map(t=>TV[t].n).join(", ")}">${c.tv.map(shape).join("")}</div>`:""}</div>
+      ${mode!=="ex"&&c.rev.length?`<div><div class="lbl">Also linked from</div><div class="chips">${c.rev.map(g=>chip(g,true)).join("")}</div></div>`:""}
+      <p class="desc">${esc(c.desc)}</p>
+      ${mode==="ex"?`<button class="remove" data-unpick="${c.code}">Remove from set</button>`:""}
+      <div class="act"><div class="lbl">Example activity</div>${esc(c.act)}</div>
+      ${mode==="ex"?"":`<button class="pick" data-pick="${c.code}" aria-pressed="false">+ Select for exercise</button>`}
+    </div></article>`;
+}
+const main=document.getElementById("main");
+main.innerHTML=Object.entries(FW).map(([k,f])=>`<section class="group" data-group="${k}"><div class="gtitle"><h2>${f.name}</h2><span>${f.sub}</span></div><div class="grid">${cards.filter(c=>c.fw===k).map(c=>cardHTML(c)).join("")}</div></section>`).join("")+`<p class="empty" id="empty" hidden>No cards match. Clear the search or choose another framework.</p>`;
+
+const status=document.getElementById("status");
+function apply(){
+  let shown=0;
+  main.querySelectorAll(".card").forEach(el=>{
+    const c=byCode[el.dataset.code];
+    const txt=(c.code+" "+c.title+" "+c.desc+" "+c.act).toLowerCase();
+    const ok=(filt==="all"||c.fw===filt)&&(!q||txt.includes(q))&&(!tvF||c.tv.includes(tvF));
+    el.hidden=!ok; if(ok)shown++;
+  });
+  main.querySelectorAll(".group").forEach(g=>g.hidden=!g.querySelector(".card:not([hidden])"));
+  document.getElementById("empty").hidden=shown>0;
+  const rel=sel?new Set([sel,...nb(sel)]):null;
+  document.body.classList.toggle("focusing",!!sel&&view==="cards");
+  main.querySelectorAll(".card").forEach(el=>{el.classList.toggle("dim",!!rel&&!rel.has(el.dataset.code));el.classList.toggle("sel",el.dataset.code===sel)});
+  const parts=[];
+  if(sel){const c=byCode[sel];parts.push(`Showing <b>${c.code} ${esc(c.title)}</b> and ${nb(sel).size} connected cards`)}
+  if(tvF)parts.push(`Transversal: <b>${TV[tvF].n}</b>`);
+  if(parts.length){status.hidden=false;status.innerHTML=parts.join(" · ")+` <button class="btn" id="clr">Show all cards</button>`;document.getElementById("clr").onclick=()=>{sel=null;tvF=null;syncTv();apply()}}
+  else status.hidden=true;
+}
+function syncTv(){document.querySelectorAll(".tv").forEach(b=>b.setAttribute("aria-pressed",b.dataset.tv===tvF))}
+function syncPicks(){
+  main.querySelectorAll(".pick").forEach(b=>{const on=picked.includes(b.dataset.pick);b.setAttribute("aria-pressed",on);b.textContent=on?"✓ Selected for exercise":"+ Select for exercise"});
+  renderModes();
+  const ge=document.getElementById("goEx");ge.hidden=!picked.length||view!=="cards";ge.textContent=`Go to exercise (${picked.length} selected) →`;
+  const tr=document.getElementById("tray");tr.hidden=!picked.length||view!=="cards";
+  tr.innerHTML=`<span class="tl">Selected for exercise<span class="num">${picked.length}</span></span><div class="chips">${picked.map(c=>chip(c)).join("")}</div><button class="btn" id="clearPicks">Clear selection</button>`;
+  store.set("scaffold.set",picked);
+}
+function renderModes(){
+  const n=picked.length;
+  const exSub=n?`${n} card${n===1?"":"s"} selected · design activities`:"Draw a set or select cards first";
+  const html=`<button class="mode" data-view="cards" role="tab" aria-selected="${view==="cards"}"><span class="n">1</span><span class="tx"><b>Cards</b><small>Browse and select cards</small></span></button>
+    <span class="arr" aria-hidden="true">→</span>
+    <button class="mode" data-view="ex" role="tab" aria-selected="${view==="ex"}"><span class="n">2</span><span class="tx"><b>Exercise</b><small>${exSub}</small></span></button>`;
+  document.querySelectorAll("[data-modes]").forEach(m=>m.innerHTML=html);
+}
+function setView(v){
+  view=v;
+  document.getElementById("cardsView").hidden=v!=="cards";
+  document.getElementById("filters").hidden=v!=="cards";
+  document.getElementById("exView").hidden=v!=="ex";
+  if(v==="ex")renderEx();
+  syncPicks();
+  apply();
+  window.scrollTo({top:0});
+}
+function go(code){
+  if(view!=="cards")setView("cards");
+  const el=document.getElementById(idOf(code));
+  if(sel&&sel!==code){sel=code;apply()}
+  if(el.hidden){filt="all";q="";document.getElementById("q").value="";tvF=null;syncTv();document.querySelectorAll(".fw").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f==="all"));apply()}
+  const smooth=!matchMedia("(prefers-reduced-motion:reduce)").matches;
+  el.scrollIntoView({behavior:smooth?"smooth":"auto",block:"center"});
+  el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");
+  el.querySelector(".cardhead").focus({preventScroll:true});
+}
+
+/* ---------- exercise view ---------- */
+const exView=document.getElementById("exView");
+const setKey=()=>picked.slice().sort().join("|");
+const setToken=()=>"set-"+picked.map(idOf).join("-");
+function drawSet(){
+  const order=["green","life","dig","ent"];
+  for(let tries=0;tries<200;tries++){
+    const shuffled=order.slice().sort(()=>Math.random()-.5);
+    const pool=cards.filter(c=>c.fw===shuffled[0]);
+    const set=[pool[Math.floor(Math.random()*pool.length)].code];
+    let ok=true;
+    for(const fw of shuffled.slice(1)){
+      const cands=cards.filter(c=>c.fw===fw&&set.some(s=>nb(s).has(c.code)));
+      if(!cands.length){ok=false;break}
+      set.push(cands[Math.floor(Math.random()*cands.length)].code);
+    }
+    if(ok)return set;
+  }
+  return EXAMPLE.slice();
+}
+function pairs(){
+  const out=[];
+  for(let i=0;i<picked.length;i++)for(let j=i+1;j<picked.length;j++){
+    const a=byCode[picked[i]],b=byCode[picked[j]];
+    const ab=a.gw.includes(b.code),ba=b.gw.includes(a.code);
+    if(ab||ba)out.push({a:a.code,b:b.code,ab,ba});
+  }
+  return out;
+}
+function mapSVG(){
+  const n=picked.length,W=340,H=280,cx=W/2,cy=H/2,R=n<=2?90:105,r=30;
+  const pos={};picked.forEach((c,i)=>{const t=-Math.PI/2+i*2*Math.PI/n+(n===4?Math.PI/4:0);pos[c]=[cx+R*Math.cos(t),cy+R*Math.sin(t)]});
+  const edges=pairs().map(p=>{
+    const [x1,y1]=pos[p.a],[x2,y2]=pos[p.b],d=Math.hypot(x2-x1,y2-y1),ux=(x2-x1)/d,uy=(y2-y1)/d;
+    const sx=x1+ux*(r+4),sy=y1+uy*(r+4),ex=x2-ux*(r+4),ey=y2-uy*(r+4);
+    const two=p.ab&&p.ba;
+    const ms=two||p.ba?' marker-start="url(#ah)"':"",me=two||p.ab?' marker-end="url(#ah)"':"";
+    return `<line class="edge" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke-width="${two?3:1.6}" ${two?"":'stroke-dasharray="5 4"'}${ms}${me}/>`;
+  }).join("");
+  const nodes=picked.map(c=>{const[x,y]=pos[c],k=byCode[c];return `<circle cx="${x}" cy="${y}" r="${r}" fill="${FW[k.fw].c1}"/><text class="lab${k.fw==="life"?" dark":""}" x="${x}" y="${y}">${c}</text>`}).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Map of links between the selected cards"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="currentColor" style="fill:var(--fg)"/></marker></defs>${edges}${nodes}</svg>`;
+}
+function bridges(){
+  const out=[];
+  cards.forEach(c=>{if(picked.includes(c.code))return;const hits=picked.filter(p=>nb(c.code).has(p));if(hits.length>=2)out.push({c:c.code,hits})});
+  return out.sort((a,b)=>b.hits.length-a.hits.length).slice(0,8);
+}
+const blankAct=()=>({title:"",learners:"",desc:"",comp:{}});
+function loadWS(){return store.get("scaffold.ws2."+setKey(),{acts:[blankAct()]})}
+function saveWS(ws){store.set("scaffold.ws2."+setKey(),ws);const s=document.getElementById("savedNote");if(s)s.textContent="Draft saved in this browser"}
+function renderEx(){
+  const n=picked.length;
+  const word=["zero","one","two","three","four","five","six","seven","eight"][n]||n;
+  let h=`<div class="task">
+    <h2>Group work</h2>
+    <p>Based on the selected cards and the example activities, create <b>learning activities or cases</b> that show how the ${n>=2?word+" ":""}competences are interconnected.</p>
+    <div class="actions">
+      <button class="btn${n<2?" primary":""}" id="pickMore">← ${n?"Add or remove cards":"Choose cards in the Cards list"}</button>
+      <button class="btn" id="draw">${n?"Replace with a random set":"Get a random set"}</button>
+      ${n?`<button class="btn" id="clearSet">Clear set</button>`:""}
+    </div>
+    <p class="exhelp"><b>Random set:</b> gives you 4 cards, one from each framework (DigComp, EntreComp, LifeComp, GreenComp). Each card is listed under <b>Good with</b> on at least one other card in the set, so they are guaranteed to connect.</p>
+    ${n?`<div class="setcode">To open this exact set for a group, add <code>#${setToken()}</code> to the end of this page's link.</div>`:""}
+  </div>`;
+  if(n<2){
+    h+=`<div class="blank">Choose at least 2 cards. Go back to Cards and tap <b>+ Select for exercise</b> on the cards you want, or get a random set.</div>`;
+    exView.innerHTML=h;return;
+  }
+  h+=`<section><h3 class="sec">Selected cards</h3><div class="exgrid">${picked.map(c=>cardHTML(byCode[c],"ex")).join("")}</div>
+      <p class="hint" style="margin-top:8px">The outlined boxes are the tips to build on. Codes outlined in black under Good with are inside your set.</p></section>`;
+  const ps=pairs(),br=bridges();
+  h+=`<section><h3 class="sec">How the cards connect</h3><div class="links"><div class="map">${mapSVG()}</div><div class="linklist">
+    ${ps.length?`<div><div class="lbl">Printed links inside the set</div><ul>${ps.map(p=>`<li><b>${p.a}</b> ${p.ab&&p.ba?"⇄":p.ab?"→":"←"} <b>${p.b}</b> · ${esc(byCode[p.a].title)} and ${esc(byCode[p.b].title)}${p.ab&&p.ba?" list each other":` (only ${p.ab?p.a:p.b} lists it)`}</li>`).join("")}</ul></div>`:`<p class="hint">None of these cards list each other under Good with. The link is yours to build, which makes a good challenge.</p>`}
+    ${br.length?`<div><div class="lbl">Bridge cards outside the set</div><p class="hint">These connect to two or more of your cards and can suggest a shared theme.</p><div class="chips" style="margin-top:6px">${br.map(b=>`<button class="chip" data-go="${b.c}" data-fw="${byCode[b.c].fw}" style="--cc:${FW[byCode[b.c].fw].c1}" title="${esc(byCode[b.c].title)} · links to ${b.hits.join(", ")}">${b.c} · ${esc(byCode[b.c].title)}</button>`).join("")}</div></div>`:""}
+    <p class="hint">Solid line with two arrows: both cards list each other. Dashed line: one-way link.</p>
+  </div></div></section>`;
+  const ws=loadWS();
+  h+=`<section class="ws"><div class="row"><h3 class="sec" style="margin:0">Worksheet</h3><span class="saved" id="savedNote"></span></div>
+    ${ws.acts.map((a,i)=>actHTML(a,i)).join("")}
+    <div class="actions"><button class="btn" id="addAct">+ Add another activity</button><button class="btn" id="copyWS">Copy worksheet as text</button><button class="btn primary pdfbtn" id="pdfEx">Download PDF</button><span class="saved" id="copyNote" role="status"></span></div>
+    <textarea id="copyBox" hidden readonly rows="8" aria-label="Worksheet text"></textarea>
+  </section>`;
+  exView.innerHTML=h;
+}
+function actHTML(a,i){
+  return `<div class="activity" data-i="${i}">
+    <header><h4>Activity ${i+1}</h4>${i>0?`<button class="remove" data-delact="${i}">Remove</button>`:""}</header>
+    <div class="fields">
+      <div class="f"><label for="a${i}-title">Title</label><input class="t" id="a${i}-title" data-k="title" value="${esc(a.title)}"></div>
+      <div class="f"><label for="a${i}-learners">Learners <small>(grade, group size)</small></label><input class="t" id="a${i}-learners" data-k="learners" value="${esc(a.learners)}"></div>
+      <div class="f wide"><label for="a${i}-desc">Short description</label><textarea id="a${i}-desc" data-k="desc" rows="3">${esc(a.desc)}</textarea></div>
+    </div>
+    <div><div class="lbl">Where each competence shows up</div><div class="comp">${picked.map(c=>{const k=byCode[c];return `<div class="f"><label for="a${i}-c-${idOf(c)}"><span class="sw" style="--cc:${FW[k.fw].c1}"></span>${c} ${esc(k.title)}</label><textarea id="a${i}-c-${idOf(c)}" data-c="${c}" rows="2">${esc(a.comp[c]||"")}</textarea></div>`}).join("")}</div></div>
+  </div>`;
+}
+function wsText(){
+  const ws=loadWS();
+  let t=`SCAFFOLD group work\nCards: ${picked.map(c=>c+" "+byCode[c].title).join("; ")}\n`;
+  ws.acts.forEach((a,i)=>{
+    t+=`\nACTIVITY ${i+1}: ${a.title||"(untitled)"}\nLearners: ${a.learners||""}\nDescription: ${a.desc||""}\nWhere each competence shows up:\n`;
+    picked.forEach(c=>t+=`- ${c} ${byCode[c].title}: ${a.comp[c]||""}\n`);
+  });
+  return t;
+}
+exView.addEventListener("input",e=>{
+  const box=e.target.closest(".activity");if(!box)return;
+  const ws=loadWS(),a=ws.acts[+box.dataset.i];
+  if(e.target.dataset.k)a[e.target.dataset.k]=e.target.value;
+  if(e.target.dataset.c)a.comp[e.target.dataset.c]=e.target.value;
+  saveWS(ws);
+});
+
+/* ---------- PDF export ---------- */
+let dl=null;
+const dlP=Promise.resolve().then(()=>window.claude&&window.claude.use?window.claude.use("downloads"):null).then(d=>{dl=d;if(!d)document.body.classList.add("nodl");return d}).catch(()=>{document.body.classList.add("nodl");return null});
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=()=>rej(new Error("load"));document.head.appendChild(s)})}
+async function getPdfMake(){
+  if(!(window.pdfMake&&window.pdfMake.createPdf))await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
+  if(!(window.pdfMake.vfs&&Object.keys(window.pdfMake.vfs).length))await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
+  return window.pdfMake;
+}
+const PCOL={dig:"#e4572e",ent:"#6a2a72",life:"#93b52a",green:"#13996a"};
+const lines=()=>({hLineColor:()=>"#cfd6d3",vLineColor:()=>"#cfd6d3",hLineWidth:()=>0.6,vLineWidth:()=>0.6});
+function cardPdf(c){
+  return {table:{widths:["*"],dontBreakRows:true,body:[
+    [{fillColor:PCOL[c.fw],color:c.fw==="life"?"#1f2a05":"#ffffff",margin:[5,4,5,4],columns:[{text:c.title.toUpperCase(),bold:true,fontSize:9.5},{text:c.code,bold:true,width:"auto",fontSize:9.5}]}],
+    [{margin:[5,4,5,5],stack:[
+      {text:[{text:"GOOD WITH  ",bold:true,fontSize:7,color:"#5d6b69"},{text:c.gw.join("  "),bold:true,fontSize:8}]},
+      c.tv.length?{text:"Transversal: "+c.tv.map(t=>TV[t].n).join(", "),fontSize:7,color:"#5d6b69",margin:[0,2,0,0]}:{text:""},
+      {text:c.desc,fontSize:8.5,margin:[0,4,0,4]},
+      {text:[{text:"Example activity: ",bold:true},{text:c.act,italics:true}],fontSize:8.5}
+    ]}]
+  ]},layout:lines()};
+}
+function gridPdf(list){
+  const body=[];for(let i=0;i<list.length;i+=2)body.push([cardPdf(list[i]),list[i+1]?cardPdf(list[i+1]):{text:""}]);
+  return {table:{widths:["*","*"],dontBreakRows:true,body},layout:{hLineWidth:()=>0,vLineWidth:()=>0,paddingLeft:i=>i?5:0,paddingRight:i=>i?0:5,paddingTop:()=>0,paddingBottom:()=>9}};
+}
+const today=()=>new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+const baseDoc=content=>({pageSize:"A4",pageMargins:[36,40,36,40],content,defaultStyle:{font:"Roboto",fontSize:9.5,color:"#22302f",lineHeight:1.15},
+  styles:{h1:{fontSize:20,bold:true,margin:[0,0,0,2]},h2:{fontSize:13,bold:true,margin:[0,12,0,6]},sub:{fontSize:8.5,color:"#5d6b69",margin:[0,0,0,8]}},
+  footer:(p,n)=>({text:`SCAFFOLD competence cards · ${p} / ${n}`,alignment:"center",fontSize:7,color:"#8a9693",margin:[0,12,0,0]})});
+function allDoc(){
+  const content=[{text:"Scaffold Competence Cards",style:"h1"},{text:"All 57 cards · "+today(),style:"sub"}];
+  Object.entries(FW).forEach(([k,f],i)=>{content.push({text:f.name+"  ",style:"h2",color:PCOL[k],pageBreak:i?"before":undefined},{text:f.sub,style:"sub"},gridPdf(cards.filter(c=>c.fw===k)))});
+  return baseDoc(content);
+}
+function exDoc(){
+  const sel=picked.map(c=>byCode[c]),ws=loadWS(),ps=pairs();
+  const content=[{text:"Scaffold group work",style:"h1"},{text:today(),style:"sub"},
+    {text:"Based on the selected cards and the example activities, create learning activities or cases that show how the competences are interconnected.",margin:[0,0,0,4]},
+    {text:"Selected cards",style:"h2"},gridPdf(sel),
+    {text:"How the cards connect",style:"h2"},
+    ps.length?{ul:ps.map(p=>`${p.a} ${byCode[p.a].title} and ${p.b} ${byCode[p.b].title}: ${p.ab&&p.ba?"list each other":"only "+(p.ab?p.a:p.b)+" lists the other"}`)}:{text:"None of these cards list each other under Good with."}];
+  ws.acts.forEach((a,i)=>{
+    const rows=[["Title",a.title],["Learners",a.learners],["Short description",a.desc]].map(([l,v])=>[{text:l,bold:true,fontSize:8.5},{text:v||""}]);
+    content.push({text:`Activity ${i+1}`,style:"h2",pageBreak:i===0?"before":undefined},
+      {table:{widths:[110,"*"],dontBreakRows:true,heights:r=>(r===2&&!a.desc)?60:(rows[r]&&!rows[r][1].text?22:"auto"),body:rows},layout:lines()},
+      {text:"Where each competence shows up",bold:true,margin:[0,10,0,5]},
+      {table:{widths:[150,"*"],dontBreakRows:true,heights:r=>a.comp[picked[r]]?"auto":40,body:sel.map(c=>[{stack:[{text:c.code,bold:true,color:PCOL[c.fw]},{text:c.title,fontSize:8.5}]},{text:a.comp[c.code]||""}])},layout:lines()});
+  });
+  return baseDoc(content);
+}
+async function exportPdf(kind){
+  const note=document.getElementById(kind==="ex"?"copyNote":"pdfAllNote");
+  note.textContent="Preparing PDF…";
+  try{
+    const d=dl||await dlP;
+    if(!d){note.textContent="Downloads aren't available in this view.";return}
+    const pm=await getPdfMake();
+    const blob=await new Promise(r=>pm.createPdf(kind==="ex"?exDoc():allDoc()).getBlob(r));
+    const name=kind==="ex"?`scaffold-exercise-${picked.map(idOf).join("-")}.pdf`:"scaffold-competence-cards.pdf";
+    await d.save({filename:name,data:blob});
+    note.textContent="PDF saved";
+  }catch(e){
+    const c=e&&e.code;
+    note.textContent=c==="declined"?"Download cancelled":c==="rate_limited"?"A download prompt is already open":e&&e.message==="load"?"Couldn't load the PDF tool. Check your connection and try again.":"Couldn't create the PDF. Try again.";
+    if(["unavailable","not_granted","capability_disabled","capability_removed"].includes(c))document.body.classList.add("nodl");
+  }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const t=e.target;
+  const mv=t.closest("[data-view]");if(mv){if(mv.dataset.view!==view)setView(mv.dataset.view);return}
+  if(t.closest("#goEx")){setView("ex");return}
+  const g=t.closest("[data-go]");if(g){go(g.dataset.go);return}
+  const s=t.closest("[data-sel]");if(s){sel=sel===s.dataset.sel?null:s.dataset.sel;apply();return}
+  const p=t.closest("[data-pick]");if(p){const c=p.dataset.pick;picked=picked.includes(c)?picked.filter(x=>x!==c):[...picked,c];syncPicks();return}
+  const u=t.closest("[data-unpick]");if(u){picked=picked.filter(x=>x!==u.dataset.unpick);syncPicks();renderEx();return}
+  const f=t.closest(".fw");if(f){filt=f.dataset.f;document.querySelectorAll(".fw").forEach(b=>b.setAttribute("aria-pressed",b===f));apply();return}
+  const v=t.closest(".tv");if(v){tvF=tvF===v.dataset.tv?null:v.dataset.tv;syncTv();apply();return}
+  if(t.closest("#draw")){picked=drawSet();syncPicks();renderEx();return}
+  if(t.closest("#pickMore")){setView("cards");return}
+  if(t.closest("#clearSet")){picked=[];syncPicks();renderEx();return}
+  if(t.closest("#clearPicks")){picked=[];syncPicks();return}
+  if(t.closest("#pdfAll")){exportPdf("all");return}
+  if(t.closest("#pdfEx")){exportPdf("ex");return}
+  if(t.closest("#addAct")){const ws=loadWS();ws.acts.push(blankAct());saveWS(ws);renderEx();return}
+  const d=t.closest("[data-delact]");if(d){const ws=loadWS();ws.acts.splice(+d.dataset.delact,1);saveWS(ws);renderEx();return}
+  if(t.closest("#copyWS")){
+    const txt=wsText(),note=document.getElementById("copyNote"),box=document.getElementById("copyBox");
+    const fallback=()=>{box.hidden=false;box.value=txt;box.select();note.textContent="Select the text below and copy it"};
+    try{navigator.clipboard.writeText(txt).then(()=>{note.textContent="Copied";box.hidden=true},fallback)}catch(err){fallback()}
+  }
+});
+document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();apply()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(sel||tvF)){sel=null;tvF=null;syncTv();apply()}});
+
+/* ---------- start ---------- */
+syncPicks();apply();
+const h=location.hash.slice(1);
+if(h.startsWith("set-")){
+  const codes=h.slice(4).split("-").map(x=>x.replace(/^([a-z])/,"$1.")).filter(c=>byCode[c]);
+  if(codes.length){picked=codes;syncPicks()}
+  setView("ex");
+}else if(h){const code=h.replace(/^([a-z])/,"$1.");if(byCode[code])setTimeout(()=>{sel=code;apply();go(code)},50)}
+</script>
+
+</body></html>
