@@ -115,7 +115,7 @@ button { font: inherit; cursor: pointer; }
 .toolbar h2 .x { color: var(--ink-soft); font-weight: 600; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
-.board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.board { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.7fr) minmax(0, .85fr); gap: 16px; align-items: start; }
 .bank { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .bank.drop-hot { outline: 3px dashed var(--edge); outline-offset: -3px; }
 .bank-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; }
@@ -164,6 +164,15 @@ button { font: inherit; cursor: pointer; }
 .pair .note { grid-column: 2 / 5; width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 7px; padding: 6px 9px; font: inherit; font-size: .85rem; }
 .pair .note::placeholder { color: var(--ink-soft); }
 .pair-list.drop-hot { outline: 3px dashed var(--accent); outline-offset: 4px; border-radius: 10px; }
+.card .lname { display: block; }
+.card .cdesc { display: block; margin-top: 4px; font-size: .78rem; line-height: 1.35; opacity: .88; font-weight: 400; }
+.card .cdesc b { font-weight: 700; }
+.slot.filled .card { align-items: flex-start; }
+.slot.filled .card .lname { font-weight: 700; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; cursor: pointer; width: fit-content; }
+.toggle input { width: 16px; height: 16px; accent-color: var(--accent); }
+.sources { margin: 0; font-size: .8rem; color: var(--ink-soft); max-width: 90ch; }
+.sources a { color: var(--accent); }
 .empty-msg { color: var(--ink-soft); font-size: .9rem; margin: 0; }
 
 .export { display: flex; flex-direction: column; gap: 8px; }
@@ -222,6 +231,7 @@ button { font: inherit; cursor: pointer; }
     </div>
     <div style="display:flex;flex-direction:column;gap:4px">
       <p class="lede" style="color:var(--ink)">Drag competences into pairs that feel related to you. Any combination is valid, and one competence can appear in several pairs. Add a short note to explain your thinking.</p>
+      <label class="toggle" for="descToggle"><input type="checkbox" id="descToggle"> Show descriptions in the competence lists</label>
       <p class="hint" style="margin:0" id="howto">Drag a card from either side into the middle. On a touchscreen, tap a card on the left, then a card on the right, to make a pair. Make as many pairs as you like.</p>
     </div>
     <div class="board" id="board">
@@ -237,6 +247,11 @@ button { font: inherit; cursor: pointer; }
       </div>
       <div class="bank" id="bankB"></div>
     </div>
+    <p class="sources">Descriptions come from the European Commission JRC frameworks:
+      DigComp (competence names from version 2.2, descriptors shortened from <a href="https://publications.jrc.ec.europa.eu/repository/handle/JRC144121" target="_blank" rel="noopener">DigComp 3.0</a>, 2025),
+      <a href="https://publications.jrc.ec.europa.eu/repository/handle/JRC101581" target="_blank" rel="noopener">EntreComp</a> (2016),
+      <a href="https://publications.jrc.ec.europa.eu/repository/bitstream/JRC128040/JRC128040_001.pdf" target="_blank" rel="noopener">GreenComp</a> (2022),
+      <a href="https://publications.jrc.ec.europa.eu/repository/handle/JRC120911" target="_blank" rel="noopener">LifeComp</a> (2020).</p>
   </section>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -267,6 +282,72 @@ const FW = {
     ['Learning to learn', [['L1','Growth mindset'],['L2','Critical thinking'],['L3','Managing learning']]],
   ]},
 };
+// Descriptions from the official JRC frameworks. DigComp: 2.2 competence names, descriptors shortened from DigComp 3.0 (Table 2)
+const DESC = {
+  'dig:1.1': { d: 'To articulate information needs, to know how and where to search for information and content in digital environments, to select appropriate digital tools for searching, and to distinguish relevant from irrelevant information and content.' },
+  'dig:1.2': { d: 'To assess and compare the credibility and reliability of sources of information and content in digital environments, and to critically evaluate them and the processes used to generate them.' },
+  'dig:1.3': { d: 'To organise, store and retrieve information and data in digital environments, and to collect, process and analyse them in structured digital environments.' },
+  'dig:2.1': { d: 'To interact through and with a variety of digital technologies, and to use appropriate digital communication for a given context.' },
+  'dig:2.2': { d: 'To share information and content ethically and responsibly with others through appropriate digital technologies.' },
+  'dig:2.3': { d: 'To participate in society through the ethical and responsible use of digital platforms and services, to seek opportunities for self-empowerment, and to assert one’s rights and exercise choice in digital environments.' },
+  'dig:2.4': { d: 'To use digital technologies ethically and responsibly for collaborative purposes, and for the co-construction and co-creation of information, resources and knowledge.' },
+  'dig:2.5': { d: 'To know how to behave respectfully in digital environments, to adapt communication to specific contexts, and to respect cultural, generational and other diversity.' },
+  'dig:2.6': { d: 'To manage one or multiple digital identities, to help protect one’s digital reputation, and to manage one’s digital footprint.' },
+  'dig:3.1': { d: 'To use digital technologies ethically and responsibly to create and edit a variety of content. To express oneself through digital means.' },
+  'dig:3.2': { d: 'To modify, refine and integrate new information and content into existing knowledge and resources to create new and original content and knowledge.' },
+  'dig:3.3': { d: 'To understand how copyright and licences, as well as associated legal and ethical issues, apply to digital content, and how to correctly apply them.' },
+  'dig:3.4': { d: 'To understand and implement steps to analyse a problem, recognise sub-problems, and plan and develop a sequence of instructions for a computing system to solve a problem or perform a task.' },
+  'dig:4.1': { d: 'To apply safety and cybersecurity measures to protect digital devices and content, being aware of the evolving nature of risks and threats in digital environments.' },
+  'dig:4.2': { d: 'To be aware of and exercise one’s rights in relation to personal data and privacy, to manage privacy risks, and to use and share one’s own and others’ personal data safely, ethically and responsibly.' },
+  'dig:4.3': { d: 'To use digital technologies in ways that support wellbeing and inclusion, to minimise risks to oneself and others, to balance digital and offline activities, and to protect oneself and others from dangers such as cyberbullying and harmful content.' },
+  'dig:4.4': { d: 'To be aware of the environmental impacts of digital technologies (device production, use, repair, recycling, data storage, energy consumption), to take action to reduce them, and to use digital technologies to support sustainability.' },
+  'dig:5.1': { d: 'To identify technical problems when operating digital devices and in digital environments, and to solve them through a variety of means.' },
+  'dig:5.2': { d: 'To assess one’s own and others’ needs, to evaluate, select, use and adapt digital technologies to meet them, and to adjust digital environments to contexts and needs (e.g. accessibility).' },
+  'dig:5.3': { d: 'To use digital technologies to make improvements in or new solutions for processes and products, using a human-centric approach, critical thinking and the creative, purposeful use of technology.' },
+  'dig:5.4': { d: 'To recognise where one’s own digital competence needs to be improved or updated, to address this through lifelong learning, to support others’ development, and to stay informed about digital developments.' },
+
+  'grn:1.1': { d: 'To reflect on personal values; identify and explain how values vary among people and over time, while critically evaluating how they align with sustainability values.' },
+  'grn:1.2': { d: 'To support equity and justice for current and future generations and learn from previous generations for sustainability.' },
+  'grn:1.3': { d: 'To acknowledge that humans are part of nature; and to respect the needs and rights of other species and of nature itself in order to restore and regenerate healthy and resilient ecosystems.' },
+  'grn:2.1': { d: 'To approach a sustainability problem from all sides; to consider time, space and context in order to understand how elements interact within and between systems.' },
+  'grn:2.2': { d: 'To assess information and arguments, identify assumptions, challenge the status quo, and reflect on how personal, social and cultural backgrounds influence thinking and conclusions.' },
+  'grn:2.3': { d: 'To formulate current or potential challenges as a sustainability problem in terms of difficulty, people involved, time and geographical scope, in order to identify suitable approaches to anticipating and preventing problems, and to mitigating and adapting to already existing problems.' },
+  'grn:3.1': { d: 'To envision alternative sustainable futures by imagining and developing alternative scenarios and identifying the steps needed to achieve a preferred sustainable future.' },
+  'grn:3.2': { d: 'To manage transitions and challenges in complex sustainability situations and make decisions related to the future in the face of uncertainty, ambiguity and risk.' },
+  'grn:3.3': { d: 'To adopt a relational way of thinking by exploring and linking different disciplines, using creativity and experimentation with novel ideas or methods.' },
+  'grn:4.1': { d: 'To navigate the political system, identify political responsibility and accountability for unsustainable behaviour, and demand effective policies for sustainability.' },
+  'grn:4.2': { d: 'To act for change in collaboration with others.' },
+  'grn:4.3': { d: 'To identify own potential for sustainability and to actively contribute to improving prospects for the community and the planet.' },
+
+  'ent:1.1': { h: 'Use your imagination and abilities to identify opportunities for creating value', d: 'Identify and seize opportunities to create value by exploring the social, cultural and economic landscape. Identify needs and challenges that need to be met. Establish new connections and bring together scattered elements of the landscape to create opportunities to create value.' },
+  'ent:1.2': { h: 'Develop creative and purposeful ideas', d: 'Develop several ideas and opportunities to create value, including better solutions to existing and new challenges. Explore and experiment with innovative approaches. Combine knowledge and resources to achieve valuable effects.' },
+  'ent:1.3': { h: 'Work towards your vision of the future', d: 'Imagine the future. Develop a vision to turn ideas into action. Visualise future scenarios to help guide effort and action.' },
+  'ent:1.4': { h: 'Make the most of ideas and opportunities', d: 'Judge what value is in social, cultural and economic terms. Recognise the potential an idea has for creating value and identify suitable ways of making the most out of it.' },
+  'ent:1.5': { h: 'Assess the consequences and impact of ideas, opportunities and actions', d: 'Assess the consequences of ideas that bring value and the effect of entrepreneurial action on the target community, the market, society and the environment. Reflect on how sustainable long-term social, cultural and economic goals are, and the course of action chosen. Act responsibly.' },
+  'ent:2.1': { h: 'Believe in yourself and keep developing', d: 'Reflect on your needs, aspirations and wants in the short, medium and long term. Identify and assess your individual and group strengths and weaknesses. Believe in your ability to influence the course of events, despite uncertainty, setbacks and temporary failures.' },
+  'ent:2.2': { h: 'Stay focused and don’t give up', d: 'Be determined to turn ideas into action and satisfy your need to achieve. Be prepared to be patient and keep trying to achieve your long-term individual or group aims. Be resilient under pressure, adversity and temporary failure.' },
+  'ent:2.3': { h: 'Gather and manage the resources you need', d: 'Get and manage the material, non-material and digital resources needed to turn ideas into action. Make the most of limited resources. Get and manage the competences needed at any stage, including technical, legal, tax and digital competences.' },
+  'ent:2.4': { h: 'Develop financial and economic know-how', d: 'Estimate the cost of turning an idea into a value-creating activity. Plan, put in place and evaluate financial decisions over time. Manage financing to make sure the value-creating activity can last over the long term.' },
+  'ent:2.5': { h: 'Inspire, enthuse and get others on board', d: 'Inspire and enthuse relevant stakeholders. Get the support needed to achieve valuable outcomes. Demonstrate effective communication, persuasion, negotiation and leadership.' },
+  'ent:3.1': { h: 'Go for it', d: 'Initiate processes that create value. Take up challenges. Act and work independently to achieve goals, stick to intentions and carry out planned tasks.' },
+  'ent:3.2': { h: 'Prioritise, organise and follow up', d: 'Set long-, medium- and short-term goals. Define priorities and action plans. Adapt to unforeseen changes.' },
+  'ent:3.3': { h: 'Make decisions dealing with uncertainty, ambiguity and risk', d: 'Make decisions when the result of that decision is uncertain, when the information available is partial or ambiguous, or when there is a risk of unintended outcomes. Within the value-creating process, include structured ways of testing ideas and prototypes from the early stages, to reduce risks of failing. Handle fast-moving situations promptly and flexibly.' },
+  'ent:3.4': { h: 'Team up, collaborate and network', d: 'Work together and co-operate with others to develop ideas and turn them into action. Network. Solve conflicts and face up to competition positively when necessary.' },
+  'ent:3.5': { h: 'Learn by doing', d: 'Use any initiative for value creation as a learning opportunity. Learn with others, including peers and mentors. Reflect and learn from both success and failure (your own and other people’s).' },
+
+  'lif:P1': { d: 'Awareness and management of emotions, thoughts and behaviour.' },
+  'lif:P2': { d: 'Ability to manage transitions and uncertainty, and to face challenges.' },
+  'lif:P3': { d: 'Pursuit of life satisfaction, care of physical, mental and social health, and adoption of a sustainable lifestyle.' },
+  'lif:S1': { d: 'The understanding of another person’s emotions, experiences and values, and the provision of appropriate responses.' },
+  'lif:S2': { d: 'Use of relevant communication strategies, domain-specific codes and tools depending on the context and the content.' },
+  'lif:S3': { d: 'Engagement in group activity and teamwork acknowledging and respecting others.' },
+  'lif:L1': { d: 'Belief in one’s and others’ potential to continuously learn and progress.' },
+  'lif:L2': { d: 'Assessment of information and arguments to support reasoned conclusions and develop innovative solutions.' },
+  'lif:L3': { d: 'The planning, organising, monitoring and reviewing of one’s own learning.' },
+};
+const descHTML = id => { const x = DESC[id]; if (!x) return ''; return `<span class="cdesc">${x.h ? `<b>${x.h}.</b> ` : ''}${x.d}</span>`; };
+let showDesc = false;
+try { showDesc = localStorage.getItem('cm-desc') === '1'; } catch (e) {}
 const ORDER = ['dig','grn','ent','lif'];
 const QUICK = [['lif','dig'],['dig','grn'],['dig','ent'],['ent','grn'],['lif','grn'],['lif','ent']];
 
@@ -360,14 +441,15 @@ function usage() {
   return u;
 }
 
-function cardEl(id, origin) {
+function cardEl(id, origin, withDesc) {
   const it = ITEMS[id];
   const el = document.createElement('button');
   el.type = 'button';
   el.className = 'card ' + FW[it.fw].cls;
   el.dataset.id = id;
   el.dataset.origin = origin; // 'bank' or 'r{row}'
-  el.innerHTML = `<span class="code">${it.code}</span><span class="label">${it.label}</span>`;
+  el.innerHTML = `<span class="code">${it.code}</span><span class="label"><span class="lname">${it.label}</span>${withDesc ? descHTML(id) : ''}</span>`;
+  if (!withDesc && DESC[id]) el.title = (DESC[id].h ? DESC[id].h + '. ' : '') + DESC[id].d;
   return el;
 }
 
@@ -382,7 +464,7 @@ function renderBank(side) {
     a.innerHTML = `<span class="area-name">${area}</span>`;
     const cards = document.createElement('div'); cards.className = 'cards';
     for (const [code] of list) {
-      const id = k + ':' + code, el = cardEl(id, 'bank');
+      const id = k + ':' + code, el = cardEl(id, 'bank', showDesc);
       if (u[id]) el.insertAdjacentHTML('beforeend', `<span class="used" title="Used in ${u[id]} pair(s)">×${u[id]}</span>`);
       el.setAttribute('aria-label', `${ITEMS[id].label}. Add to a pair.`);
       cards.appendChild(el);
@@ -403,7 +485,7 @@ function renderPairs() {
       const k = side === 'a' ? A : B;
       const slot = document.createElement('div');
       slot.dataset.drop = 'slot'; slot.dataset.row = i; slot.dataset.side = side;
-      if (p[side]) { slot.className = 'slot filled'; slot.appendChild(cardEl(p[side], 'r' + i)); }
+      if (p[side]) { slot.className = 'slot filled'; slot.appendChild(cardEl(p[side], 'r' + i, true)); }
       else { slot.className = 'slot empty ' + FW[k].cls; slot.textContent = FW[k].name; }
       row.appendChild(slot);
       if (side === 'a') { const l = document.createElement('span'); l.className = 'link'; l.textContent = '↔'; l.setAttribute('aria-hidden', 'true'); row.appendChild(l); }
@@ -597,6 +679,8 @@ $('copyBtn').onclick = () => {
 const last = store.get('cm-last');
 if (Array.isArray(last) && last.length === 2 && FW[last[0]] && FW[last[1]]) picked = last.slice();
 renderPicker(); renderQuick();
+$('descToggle').checked = showDesc;
+$('descToggle').onchange = () => { showDesc = $('descToggle').checked; try { localStorage.setItem('cm-desc', showDesc ? '1' : '0'); } catch (e) {} if (A) { renderBank('a'); renderBank('b'); } };
 if ('ontouchstart' in window && !matchMedia('(pointer: fine)').matches) {
   $('howto').textContent = 'Tap a card on one side, then a card on the other side, to make a pair. Tap × to remove a pair.';
 }
